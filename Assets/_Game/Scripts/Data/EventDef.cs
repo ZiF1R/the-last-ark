@@ -19,7 +19,7 @@ public class EventDef : IWeighted
 
 	[Header("Settings")]
 	public int priority;
-	public int weight { get; set; } = 10;
+	[field: SerializeField] public int weight { get; set; } = 10;
 	public bool once = true;
 
 	public Choice[] choices;
