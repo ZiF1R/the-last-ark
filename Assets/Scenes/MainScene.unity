@@ -242,6 +242,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2acd95ea33c5a6d4897feb46c2176764, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameFlow
+  db: {fileID: 11400000, guid: e2136db9489780c44a1f482872462a48, type: 2}
 --- !u!1 &490538510
 GameObject:
   m_ObjectHideFlags: 0

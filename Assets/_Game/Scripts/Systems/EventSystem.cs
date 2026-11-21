@@ -2,7 +2,6 @@
 
 public class EventSystem
 {
-
 	public EventDef PickEvent(RunState state, ContentDatabase db)
 	{
 		var candidates = new List<EventDef>();

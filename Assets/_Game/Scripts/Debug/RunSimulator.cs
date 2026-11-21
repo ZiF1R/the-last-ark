@@ -22,18 +22,16 @@ public static class RunSimulator
 		if (db.endings == null || db.endings.Count == 0) { Debug.LogError("[Sim] В базе нет концовок."); return; }
 
 		var draft = new DraftSystem();
-		var effects = new EffectResolver();
-		var endings = new EndingResolver();
 
 		Debug.Log($"<b>[Sim] {runs} ранов на политику, seed {seed}, оффер {OFFER_SIZE}</b>");
 
-		Simulate(db, runs, seed, draft, effects, endings, PickRandom, "RANDOM — случайный игрок");
-		Simulate(db, runs, seed, draft, effects, endings, PickGreedy, "GREEDY — аккуратный игрок");
+		Simulate(db, runs, seed, draft, PickRandom, "RANDOM — случайный игрок");
+		Simulate(db, runs, seed, draft, PickGreedy, "GREEDY — аккуратный игрок");
 	}
 
 	// ------------------------------------------------------------------
 	static void Simulate(ContentDatabase db, int runs, int seed,
-						 DraftSystem draft, EffectResolver effects, EndingResolver endings,
+						 DraftSystem draft,
 						 System.Func<List<CardDef>, RunState, CardDef> pick,
 						 string label)
 	{
@@ -57,7 +55,7 @@ public static class RunSimulator
 				// Дрейф до выбора: игрок видит потерю и может ответить на неё этим же пиком.
 				if (DriftTurns.Contains(st.turn))
 				{
-					st.Apply(-1, 0, 0);
+					st.ApplyStats(-1, 0, 0);
 					if (st.IsDead) break;
 				}
 
@@ -81,7 +79,7 @@ public static class RunSimulator
 				foreach (CardDef other in offer)
 					if (!ReferenceEquals(other, chosen)) st.leftBehind.Add(other);
 
-				effects.ApplyCard(chosen, st);
+				EffectResolver.ApplyCard(chosen, st);
 				st.crew.Add(chosen);
 				pickedCards.Add(chosen);
 
@@ -103,7 +101,7 @@ public static class RunSimulator
 				deathCause[cause] = n + 1;
 			}
 
-			EndingDef ending = endings.Resolve(st, db);
+			EndingDef ending = EndingResolver.Resolve(st, db);
 			if (ending == null) { noEnding++; continue; }
 
 			string key = IdOf(ending);

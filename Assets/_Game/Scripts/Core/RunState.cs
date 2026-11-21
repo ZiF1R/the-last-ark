@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -17,11 +18,19 @@ public class RunState
 
 	public const int MAX_SLOTS = 6;
 
-	public void Apply(int s, int sc, int m)
+	public StatDelta ApplyStats(int s, int sc, int m)
 	{
+		int s0 = survival, sc0 = science, m0 = morale;
+
 		survival = Mathf.Clamp(survival + s, 0, 10);
 		science = Mathf.Clamp(science + sc, 0, 10);
 		morale = Mathf.Clamp(morale + m, 0, 10);
+
+		return new StatDelta(
+			survival - s0,
+			science - sc0,
+			morale - m0
+		);
 	}
 
 	public List<CardTag> GetCrewTags()

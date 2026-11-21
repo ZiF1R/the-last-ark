@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-//using System.Linq;
-//using UnityEngine;
 
 public class DraftSystem
 {
@@ -12,6 +10,8 @@ public class DraftSystem
 		foreach (CardDef card in db.cards)
 		{
 			if (state.crew.Contains(card)) continue;
+
+			// if there are only cards with 2 slots cost, empty slot remaining //! fix
 			if (card.slotCost > state.SlotsLeft) continue;
 			candidates.Add(card);
 		}
@@ -29,26 +29,4 @@ public class DraftSystem
 
 		return offer;
 	}
-
-	//public static CardDef PickWeighted(List<CardDef> candidates)
-	//{
-	//	int totalCardsWeight = candidates.Sum(c => c.weight);
-
-	//	if (totalCardsWeight <= 0)
-	//	{
-	//		int i = Random.Range(0, candidates.Count);
-	//		return candidates[i];
-	//	}
-
-	//	int roll = Random.Range(0, totalCardsWeight);
-	//	foreach (CardDef card in candidates)
-	//	{
-	//		roll -= card.weight;
-
-	//		if (roll < 0)
-	//			return card;
-	//	}
-
-	//	return candidates[^1]; 
-	//}
 }

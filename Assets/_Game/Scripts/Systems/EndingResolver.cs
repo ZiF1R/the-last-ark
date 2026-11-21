@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-public class EndingResolver
+public static class EndingResolver
 {
-	public EndingDef Resolve(RunState state, ContentDatabase db)
+	public static EndingDef Resolve(RunState state, ContentDatabase db)
 	{
 		List<CardTag> crewTags = state.GetCrewTags();
 
