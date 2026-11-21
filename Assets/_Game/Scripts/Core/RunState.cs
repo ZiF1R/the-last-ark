@@ -9,6 +9,7 @@ public class RunState
 	public List<CardDef> crew = new();
 	public List<CardDef> leftBehind = new();
 	public HashSet<string> flags = new();
+	public HashSet<string> usedEventIds = new();
 	public int SlotsLeft => MAX_SLOTS - crew.ToArray().Sum(c => c.slotCost);
 	public bool IsDead => survival <= 0 || science <= 0 || morale <= 0;
 	public bool IsFull => SlotsLeft <= 0;
@@ -34,4 +35,33 @@ public class RunState
 
 		return tags;
 	}
+
+	public bool HasTag(CardTag tag)
+	{
+		foreach (CardDef card in crew)
+			if (card.tags != null && card.tags.Contains(tag))
+				return true;
+
+		return false;
+	}
+
+	public bool HasRole(CardRole role)
+	{
+		foreach (CardDef card in crew)
+			if (card.role == role)
+				return true;
+
+		return false;
+	}
+
+	public bool HasFlag(string flag)
+		=> !string.IsNullOrEmpty(flag) && flags.Contains(flag);
+
+	public int GetStat(StatKind stat) => stat switch
+	{
+		StatKind.Survival => survival,
+		StatKind.Science => science,
+		StatKind.Morale => morale,
+		_ => 0
+	};
 }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+//using System.Linq;
+//using UnityEngine;
 
 public class DraftSystem
 {
@@ -22,7 +22,7 @@ public class DraftSystem
 		{
 			//TODO: after first roll pick different roles
 
-			CardDef candidate = PickWeighted(candidates);
+			CardDef candidate = WeightedPicker.PickWeighted(candidates);
 			offer.Add(candidate);
 			candidates.Remove(candidate);
 		}
@@ -30,25 +30,25 @@ public class DraftSystem
 		return offer;
 	}
 
-	static CardDef PickWeighted(List<CardDef> candidates)
-	{
-		int totalCardsWeight = candidates.Sum(c => c.weight);
+	//public static CardDef PickWeighted(List<CardDef> candidates)
+	//{
+	//	int totalCardsWeight = candidates.Sum(c => c.weight);
 
-		if (totalCardsWeight <= 0)
-		{
-			int i = Random.Range(0, candidates.Count);
-			return candidates[i];
-		}
+	//	if (totalCardsWeight <= 0)
+	//	{
+	//		int i = Random.Range(0, candidates.Count);
+	//		return candidates[i];
+	//	}
 
-		int roll = Random.Range(0, totalCardsWeight);
-		foreach (CardDef card in candidates)
-		{
-			roll -= card.weight;
+	//	int roll = Random.Range(0, totalCardsWeight);
+	//	foreach (CardDef card in candidates)
+	//	{
+	//		roll -= card.weight;
 
-			if (roll < 0)
-				return card;
-		}
+	//		if (roll < 0)
+	//			return card;
+	//	}
 
-		return candidates[candidates.Count - 1]; 
-	}
+	//	return candidates[^1]; 
+	//}
 }

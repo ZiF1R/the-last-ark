@@ -109,8 +109,7 @@ public class ContentDatabase : ScriptableObject
 			if (e.minTurn > e.maxTurn)
 				errors.Add($"{where}: minTurn ({e.minTurn}) > maxTurn ({e.maxTurn}) — событие не сработает никогда.");
 
-			if (e.requireTags != null && e.forbidTags != null && e.requireTags.Intersect(e.forbidTags).Any())
-				errors.Add($"{where}: один тег одновременно в requireTags и forbidTags — событие невозможно.");
+			ValidateEventConditions(e, errors, warnings);
 
 			if (e.choices == null || e.choices.Length != 2)
 			{
@@ -206,6 +205,15 @@ public class ContentDatabase : ScriptableObject
 					if (!string.IsNullOrWhiteSpace(ch?.setFlag))
 						setFlags.Add(ch.setFlag);
 				}
+
+				if (e?.conditions == null) continue;
+				foreach (EventCondition c in e.conditions)
+				{
+					if (c == null) continue;
+
+					if (c.kind == ConditionKind.FlagSet && !setFlags.Contains(c.flag))
+						warnings.Add($"Event '{e.id}': условие FlagSet '{c.flag}' нигде не выставляется — событие не сработает.");
+				}
 			}
 		}
 
@@ -233,5 +241,76 @@ public class ContentDatabase : ScriptableObject
 				}
 			}
 		}
+	}
+
+	private void ValidateEventConditions(EventDef e, List<string> errors, List<string> warnings)
+	{
+		if (e.conditions == null || e.conditions.Length == 0)
+		{
+			warnings.Add($"Event '{e.id}': нет условий — событие может сработать в любой момент.");
+			return;
+		}
+
+		var tagsPresent = new HashSet<CardTag>();
+		var tagsAbsent = new HashSet<CardTag>();
+		var rolesPresent = new HashSet<CardRole>();
+		var rolesAbsent = new HashSet<CardRole>();
+		var flagsSet = new HashSet<string>();
+		var flagsAbsent = new HashSet<string>();
+		var statMin = new Dictionary<StatKind, int>();
+		var statMax = new Dictionary<StatKind, int>();
+
+		foreach (EventCondition c in e.conditions)
+		{
+			if (c == null) { errors.Add($"Event '{e.id}': null-условие."); continue; }
+
+			switch (c.kind)
+			{
+				case ConditionKind.TagPresent: tagsPresent.Add(c.tag); break;
+				case ConditionKind.TagAbsent: tagsAbsent.Add(c.tag); break;
+				case ConditionKind.RolePresent: rolesPresent.Add(c.role); break;
+				case ConditionKind.RoleAbsent: rolesAbsent.Add(c.role); break;
+
+				case ConditionKind.FlagSet:
+					if (string.IsNullOrWhiteSpace(c.flag)) errors.Add($"Event '{e.id}': FlagSet с пустым flag.");
+					else flagsSet.Add(c.flag);
+					break;
+
+				case ConditionKind.FlagAbsent:
+					if (string.IsNullOrWhiteSpace(c.flag)) errors.Add($"Event '{e.id}': FlagAbsent с пустым flag.");
+					else flagsAbsent.Add(c.flag);
+					break;
+
+				case ConditionKind.StatAtLeast:
+					if (c.value < 0 || c.value > 10)
+						warnings.Add($"Event '{e.id}': StatAtLeast {c.stat} = {c.value}, вне диапазона 0..10.");
+					statMin[c.stat] = c.value;
+					break;
+
+				case ConditionKind.StatAtMost:
+					if (c.value < 0 || c.value > 10)
+						warnings.Add($"Event '{e.id}': StatAtMost {c.stat} = {c.value}, вне диапазона 0..10.");
+					statMax[c.stat] = c.value;
+					break;
+
+				case ConditionKind.CrewCountAtLeast:
+				case ConditionKind.CrewCountAtMost:
+					if (c.value < 0) errors.Add($"Event '{e.id}': {c.kind} с отрицательным value.");
+					break;
+			}
+		}
+
+		foreach (var t in tagsPresent.Intersect(tagsAbsent))
+			errors.Add($"Event '{e.id}': тег {t} одновременно требуется и запрещён — событие невозможно.");
+		foreach (var r in rolesPresent.Intersect(rolesAbsent))
+			errors.Add($"Event '{e.id}': роль {r} одновременно требуется и запрещена.");
+		foreach (var f in flagsSet.Intersect(flagsAbsent))
+			errors.Add($"Event '{e.id}': флаг '{f}' одновременно требуется и запрещён.");
+		foreach (var kv in statMin)
+			if (statMax.TryGetValue(kv.Key, out int max) && kv.Value > max)
+				errors.Add($"Event '{e.id}': {kv.Key} >= {kv.Value} и <= {max} — событие невозможно.");
+
+		if (e.weight <= 0 && e.priority <= 0)
+			warnings.Add($"Event '{e.id}': weight <= 0 и priority = 0 — событие не будет выбрано никогда.");
 	}
 }

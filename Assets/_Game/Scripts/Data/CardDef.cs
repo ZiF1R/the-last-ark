@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [Serializable]
-public class CardDef
+public class CardDef : IWeighted
 {
 	public string id;
 	public string displayName;
@@ -15,7 +15,7 @@ public class CardDef
 	public int science;
 	public int morale;
 	public string eventOnPickId;
-	public int weight = 10; // 0 - never, 10 - usual, 20 - frequent
+	public int weight { get; set; } = 10; // 0 - never, 10 - usual, 20 - frequent
 	public Sprite icon;
 }
 
