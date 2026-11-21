@@ -5,7 +5,7 @@ using UnityEngine;
 public class Choice
 {
 	public string label;
-	[TextArea] public string result;
+	[TextArea] public string result; // showing after making choice
 	public int survival;
 	public int science;
 	public int morale;

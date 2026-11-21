@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 [Serializable]
 public class CardDef
@@ -13,8 +14,8 @@ public class CardDef
 	public int survival;
 	public int science;
 	public int morale;
-	public string eventOnPick = "";
-	public int weight = 10;
+	public string eventOnPickId = "";
+	public int weight = 10; // 0 - never, 10 - usual, 20 - frequent
 	public Sprite icon;
 }
 
