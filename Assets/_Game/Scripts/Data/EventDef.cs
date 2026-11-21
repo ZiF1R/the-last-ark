@@ -1,4 +1,3 @@
-using NUnit.Framework.Interfaces;
 using System;
 using UnityEngine;
 
@@ -32,14 +31,14 @@ public class EventCondition
 	//public StatType stat; // для StatAtLeast / StatAtMost
 	public int value; // порог
 
-	//public bool Evaluate(RunState rs) => kind switch
+	//public bool Evaluate(RunState state) => kind switch
 	//{
-	//	ConditionKind.TagPresent => rs.HasTag(tag),
-	//	ConditionKind.TagAbsent => !rs.HasTag(tag),
-	//	ConditionKind.StatAtLeast => rs.GetStat(stat) >= value,
-	//	ConditionKind.StatAtMost => rs.GetStat(stat) <= value,
-	//	ConditionKind.FlagSet => rs.flags.Contains(tag.ToString()), // либо отдельное string-поле
-	//	ConditionKind.FlagAbsent => !rs.flags.Contains(tag.ToString()),
+	//	ConditionKind.TagPresent => state.HasTag(tag),
+	//	ConditionKind.TagAbsent => !state.HasTag(tag),
+	//	ConditionKind.StatAtLeast => state.GetStat(stat) >= value,
+	//	ConditionKind.StatAtMost => state.GetStat(stat) <= value,
+	//	ConditionKind.FlagSet => state.flags.Contains(tag.ToString()), // либо отдельное string-поле
+	//	ConditionKind.FlagAbsent => !state.flags.Contains(tag.ToString()),
 	//	_ => true
 	//};
 }

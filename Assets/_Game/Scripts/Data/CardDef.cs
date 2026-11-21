@@ -14,7 +14,7 @@ public class CardDef
 	public int survival;
 	public int science;
 	public int morale;
-	public string eventOnPickId = "";
+	public string eventOnPickId;
 	public int weight = 10; // 0 - never, 10 - usual, 20 - frequent
 	public Sprite icon;
 }
