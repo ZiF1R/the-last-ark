@@ -6,6 +6,7 @@ public class SlotRailView : MonoBehaviour
 	[SerializeField] Image[] slots;
 	[SerializeField] Color emptyColor = new Color(0.13f, 0.20f, 0.23f);
 	[SerializeField] Color filledColor = new Color(0.24f, 0.35f, 0.39f);
+	[SerializeField] Color blockedColor = new Color(0.42f, 0.16f, 0.16f);
 
 	void OnEnable()
 	{
@@ -24,9 +25,26 @@ public class SlotRailView : MonoBehaviour
 		for (int i = 0; i < slots.Length; i++)
 			slots[i].color = emptyColor;
 
-		int index = 0;
+		int slotIndex = 0;
+
 		foreach (CardDef card in state.crew)
-			for (int k = 0; k < card.slotCost && index < slots.Length; k++)
-				slots[index++].color = filledColor;
+		{
+			if (card == null) continue;
+
+			for (int k = 0; k < card.slotCost && slotIndex < slots.Length; k++)
+			{
+				while (slotIndex < slots.Length && state.sealedSlots.Contains(slotIndex))
+					slotIndex++;
+
+				if (slotIndex >= slots.Length) break;
+
+				slots[slotIndex].color = filledColor;
+				slotIndex++;
+			}
+		}
+
+		foreach (int i in state.sealedSlots)
+			if (i >= 0 && i < slots.Length)
+				slots[i].color = blockedColor;
 	}
 }

@@ -8,4 +8,6 @@ public class StatDelta
 	{
 		(survival, science, morale) = (s, sc, m);
 	}
+
+	public bool HasAny => survival != 0 || science != 0 || morale != 0;
 }

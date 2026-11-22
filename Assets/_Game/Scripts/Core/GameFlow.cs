@@ -9,7 +9,6 @@ public class GameFlow : MonoBehaviour
 	// views referenses
 
 	enum Phase { Title, Draft, Resolve, Event, EventResult, Epilogue }
-	static readonly int[] DriftTurns = { 2, 4, 6 };
 
 	RunState _state;
 	List<CardDef> _offer;
@@ -27,6 +26,13 @@ public class GameFlow : MonoBehaviour
 	void DebugStartRun()
 	{
 		StartRun();
+	}
+
+	[ContextMenu("Import Seed")]
+	void ImportSeed()
+	{
+		//db.cards = ContentSeed.Cards;
+		//db.events = ContentSeed.Events;
 	}
 
 	public void StartRun()
@@ -53,13 +59,8 @@ public class GameFlow : MonoBehaviour
 		_phase = Phase.Draft;
 		_state.turn++;
 
-		if (DriftTurns.Contains(_state.turn))
-		{
-			GameEvents.RaiseStatsChanged(
-				_state.ApplyStats(-1, 0, 0),
-				_state
-			);
-		}
+		StatDelta tick = TurnTick.Apply(_state);
+		GameEvents.RaiseStatsChanged(tick, _state);
 
 		if (_state.IsDead)
 		{
@@ -102,6 +103,10 @@ public class GameFlow : MonoBehaviour
 		GameEvents.RaiseStatsChanged(delta, _state);
 		GameEvents.RaiseCrewChanged(_state);
 
+		var synergies = SynergySystem.Evaluate(_state, db);
+		foreach (var (rule, d) in synergies)
+			GameEvents.RaiseSynergyFired(rule, d, _state);
+
 		if (_state.IsDead)
 		{
 			EnterEpilogue(); return;
@@ -140,31 +145,74 @@ public class GameFlow : MonoBehaviour
 
 	void ShowEvent(EventDef e)
 	{
-		if (e.choices.Length < 2)
+		if (e == null)
 		{
-			Debug.LogError($"[ShowEvent] Event with id={e.id} doesn't have enough choices");
-			EnterDraft();
-			return;
+			Debug.LogError("[Event] Event is null");
+			EnterDraft(); return;
+		}
+
+		if (e.choices == null || e.choices.Length < 1 || e.choices.Length > 2)
+		{
+			Debug.LogError($"[Event] '{e.id}' has {e.choices?.Length ?? 0} choices, expected 1 or 2");
+			EnterDraft(); return;
+		}
+
+		bool anyAvailable = false;
+		foreach (Choice c in e.choices)
+		{
+			if (c != null && c.IsAvailable(_state))
+			{
+				anyAvailable = true; break;
+			}
+		}
+
+		if (!anyAvailable)
+		{
+			Debug.LogError($"[Event] '{e.id}': all choices are locked — skipping");
+			_state.usedEventIds.Add(e.id);
+			EnterDraft(); return;
 		}
 
 		_phase = Phase.Event;
 		_state.usedEventIds.Add(e.id);
 		_state.pendingEventId = null;
-		GameEvents.RaiseEventTriggered(e);
+		GameEvents.RaiseEventTriggered(e, _state);
 	}
 
 	public void ChooseEvent(Choice choice)
 	{
 		if (_phase != Phase.Event) return;
+		if (choice == null) return;
+
+		if (!choice.IsAvailable(_state))
+		{
+			Debug.LogWarning("[Event] Choice is locked");
+			return;
+		}
 
 		_phase = Phase.EventResult;
+
 		StatDelta delta = _state.ApplyStats(choice.survival, choice.science, choice.morale);
 
 		if (!string.IsNullOrEmpty(choice.setFlag))
 			_state.flags.Add(choice.setFlag);
 
+		CardDef lost = null;
+
+		if (choice.removal != null && choice.removal.IsActive)
+		{
+			lost = choice.removal.Apply(_state);
+
+			if (lost == null)
+				Debug.LogWarning($"[Event] '{choice.label}': removal target not found");
+		}
+
 		GameEvents.RaiseStatsChanged(delta, _state);
-		GameEvents.RaiseEventResolved(choice);
+
+		if (lost != null)
+			GameEvents.RaiseCrewChanged(_state);
+
+		GameEvents.RaiseEventResolved(choice, lost);
 	}
 
 	public void ContinueAfterEvent()

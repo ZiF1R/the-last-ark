@@ -11,10 +11,6 @@ public static class RunSimulator
 	const int OFFER_SIZE = 3;
 	const int MAX_TURNS = 20;   // страховка от бесконечного цикла
 
-	// Дрейф: на этих ходах жизнь в ковчеге забирает 1 Выживание.
-	// Пустой массив = симуляция без дрейфа.
-	static readonly int[] DriftTurns = { 2, 4, 6 };
-
 	public static void Run(ContentDatabase db, int runs = 1000, int seed = 12345)
 	{
 		if (db == null) { Debug.LogError("[Sim] ContentDatabase не назначена."); return; }
@@ -51,13 +47,8 @@ public static class RunSimulator
 			while (!st.IsDead && !st.IsFull && st.turn < MAX_TURNS)
 			{
 				st.turn++;
-
-				// Дрейф до выбора: игрок видит потерю и может ответить на неё этим же пиком.
-				if (DriftTurns.Contains(st.turn))
-				{
-					st.ApplyStats(-1, 0, 0);
-					if (st.IsDead) break;
-				}
+				TurnTick.Apply(st);
+				if (st.IsDead) break;
 
 				List<CardDef> offer = draft.BuildOffer(st, db, OFFER_SIZE);
 
@@ -182,9 +173,13 @@ public static class RunSimulator
 
 		foreach (CardDef c in offer)
 		{
-			int s = Mathf.Clamp(st.survival + c.survival, 0, 10);
-			int sc = Mathf.Clamp(st.science + c.science, 0, 10);
-			int m = Mathf.Clamp(st.morale + c.morale, 0, 10);
+			int ds = c.delayed != null ? c.delayed.survival : 0;
+			int dsc = c.delayed != null ? c.delayed.science : 0;
+			int dm = c.delayed != null ? c.delayed.morale : 0;
+
+			int s = Mathf.Clamp(st.survival + c.survival + ds, 0, 10);
+			int sc = Mathf.Clamp(st.science + c.science + dsc, 0, 10);
+			int m = Mathf.Clamp(st.morale + c.morale + dm, 0, 10);
 
 			// Сначала «не умереть» (минимальная стата), потом суммарная полезность.
 			int lowest = Mathf.Min(s, Mathf.Min(sc, m));

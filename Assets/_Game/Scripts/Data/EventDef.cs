@@ -11,7 +11,7 @@ public class EventDef : IWeighted
 	public string causeLine;
 
 	[Header("Conditions - all required")]
-	public EventCondition[] conditions;
+	public StateCondition[] conditions;
 
 	[Header("When can appear")]
 	public int minTurn = 0;
@@ -29,7 +29,7 @@ public class EventDef : IWeighted
 		if (state.turn < minTurn || state.turn > maxTurn) return false;
 		if (conditions == null) return true;
 
-		foreach (EventCondition c in conditions)
+		foreach (StateCondition c in conditions)
 		{
 			if (c == null) continue;
 			if (!c.Evaluate(state)) return false;
@@ -57,7 +57,7 @@ public enum ConditionKind
 public enum StatKind { Survival, Science, Morale }
 
 [Serializable]
-public class EventCondition
+public class StateCondition
 {
 	public ConditionKind kind;
 
@@ -80,5 +80,19 @@ public class EventCondition
 		ConditionKind.CrewCountAtLeast => state.crew.Count >= value,
 		ConditionKind.CrewCountAtMost => state.crew.Count <= value,
 		_ => true
+	};
+	public string Describe() => kind switch
+	{
+		ConditionKind.TagPresent => $"NEEDS {tag.ToString().ToUpperInvariant()}",
+		ConditionKind.TagAbsent => $"NO {tag.ToString().ToUpperInvariant()} ALLOWED",
+		ConditionKind.RolePresent => $"NEEDS {role.ToString().ToUpperInvariant()}",
+		ConditionKind.RoleAbsent => $"NO {role.ToString().ToUpperInvariant()} ALLOWED",
+		ConditionKind.FlagSet => "NEEDS A PREVIOUS DECISION",
+		ConditionKind.FlagAbsent => "LOCKED BY A PREVIOUS DECISION",
+		ConditionKind.StatAtLeast => $"NEEDS {stat.ToString().ToUpperInvariant()} {value}+",
+		ConditionKind.StatAtMost => $"NEEDS {stat.ToString().ToUpperInvariant()} {value}-",
+		ConditionKind.CrewCountAtLeast => $"NEEDS {value}+ CREW",
+		ConditionKind.CrewCountAtMost => $"NEEDS {value} OR FEWER CREW",
+		_ => "UNAVAILABLE"
 	};
 }

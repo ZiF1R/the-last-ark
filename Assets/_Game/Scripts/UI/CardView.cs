@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -44,18 +45,55 @@ public class CardView : MonoBehaviour
 
 	static string BuildEffects(CardDef c)
 	{
-		var sb = new StringBuilder();
-		Append(sb, c.survival, "SURVIVAL", "#6FA85C");
-		Append(sb, c.science, "SCIENCE", "#4FA3A5");
-		Append(sb, c.morale, "MORALE", "#E8A33D");
-		return sb.ToString().TrimEnd('\n');
+		var lines = new List<string>();
+
+		AddLine(lines, c.survival, "SURVIVAL", "#6FA85C");
+		AddLine(lines, c.science, "SCIENCE", "#4FA3A5");
+		AddLine(lines, c.morale, "MORALE", "#E8A33D");
+
+		string delayed = BuildDelayed(c.delayed);
+		if (!string.IsNullOrEmpty(delayed))
+			lines.Add(delayed);
+
+		string period = c.passivePeriod > 1 ? $"EVERY {c.passivePeriod} TURNS" : "EACH TURN";
+		AddPassive(lines, c.passiveSurvival, "SURVIVAL", "#6FA85C", period);
+		AddPassive(lines, c.passiveScience, "SCIENCE", "#4FA3A5", period);
+		AddPassive(lines, c.passiveMorale, "MORALE", "#E8A33D", period);
+
+		return string.Join("\n", lines);
 	}
 
-	static void Append(StringBuilder sb, int value, string label, string hex)
+	static void AddLine(List<string> lines, int v, string label, string hex)
 	{
-		if (value == 0) return;
-		string sign = value > 0 ? "+" : "";
-		sb.Append($"<color={hex}>{sign}{value} {label}</color>\n");
+		if (v == 0) return;
+		lines.Add($"<color={hex}>{(v > 0 ? "+" : "")}{v} {label}</color>");
+	}
+
+	static void AddPassive(List<string> lines, int v, string label, string hex, string period)
+	{
+		if (v == 0) return;
+		lines.Add($"<size=100%><color={hex}>{(v > 0 ? "+" : "")}{v} {label} {period}</color></size>");
+	}
+
+	static string BuildDelayed(DelayedEffect d)
+	{
+		if (d == null || d.IsEmpty) return null;
+
+		var parts = new List<string>();
+		AddDelayedPart(parts, d.survival, "SURVIVAL", "#6FA85C");
+		AddDelayedPart(parts, d.science, "SCIENCE", "#4FA3A5");
+		AddDelayedPart(parts, d.morale, "MORALE", "#E8A33D");
+
+		if (parts.Count == 0) return null;
+
+		string when = d.turns == 1 ? "NEXT TURN" : $"IN {d.turns} TURNS";
+		return $"<size=100%><color=#8A8F8C>{when}:</color> {string.Join(", ", parts)}</size>";
+	}
+
+	static void AddDelayedPart(List<string> parts, int v, string label, string hex)
+	{
+		if (v == 0) return;
+		parts.Add($"<color={hex}>{(v > 0 ? "+" : "")}{v} {label}</color>");
 	}
 
 	static readonly Color[] RoleColors =

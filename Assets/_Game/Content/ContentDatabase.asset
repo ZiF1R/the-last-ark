@@ -16,12 +16,21 @@ MonoBehaviour:
   - id: alex_engineer
     displayName: Alex
     role: 1
-    quote: Characteristic
+    quote: He keeps the lights on. For now.
     tags: 0000000001000000
     slotCost: 1
     survival: 2
     science: 0
-    morale: -1
+    morale: 0
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: -2
+      science: 0
+      morale: 0
+      turns: 2
     eventOnPickId: 
     <weight>k__BackingField: 10
     icon: {fileID: 0}
@@ -34,6 +43,15 @@ MonoBehaviour:
     survival: 0
     science: 2
     morale: 0
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
     eventOnPickId: 
     <weight>k__BackingField: 10
     icon: {fileID: 0}
@@ -46,6 +64,15 @@ MonoBehaviour:
     survival: 2
     science: 0
     morale: -1
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
     eventOnPickId: 
     <weight>k__BackingField: 10
     icon: {fileID: 0}
@@ -55,9 +82,18 @@ MonoBehaviour:
     quote: Characteristic
     tags: 05000000
     slotCost: 1
-    survival: 1
+    survival: 0
     science: 0
     morale: 1
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 1
+    passivePeriod: 2
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
     eventOnPickId: 
     <weight>k__BackingField: 10
     icon: {fileID: 0}
@@ -69,7 +105,16 @@ MonoBehaviour:
     slotCost: 2
     survival: 0
     science: 0
-    morale: 2
+    morale: 1
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 1
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
     eventOnPickId: 
     <weight>k__BackingField: 10
     icon: {fileID: 0}
@@ -82,6 +127,15 @@ MonoBehaviour:
     survival: -2
     science: 1
     morale: 0
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
     eventOnPickId: cough
     <weight>k__BackingField: 10
     icon: {fileID: 0}
@@ -91,36 +145,22 @@ MonoBehaviour:
     quote: Characteristic
     tags: 08000000
     slotCost: 1
-    survival: 3
+    survival: 1
     science: 0
-    morale: 0
+    morale: -1
+    passiveSurvival: 1
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
     eventOnPickId: 
     <weight>k__BackingField: 10
     icon: {fileID: 0}
   events:
-  - id: test_event
-    title: 'TEST EVENT '
-    body: Something happened.
-    causeLine: Because you are testing
-    conditions: []
-    minTurn: 1
-    maxTurn: 100
-    priority: 0
-    <weight>k__BackingField: 10
-    once: 1
-    choices:
-    - label: LEFT
-      result: You chose left.
-      survival: 0
-      science: 0
-      morale: 0
-      setFlag: 
-    - label: RIGHT
-      result: You chose right.
-      survival: 0
-      science: 0
-      morale: 0
-      setFlag: 
   - id: cough
     title: COUGH BEHIND WALL
     body: Something happened.
@@ -143,13 +183,75 @@ MonoBehaviour:
       survival: 0
       science: 0
       morale: -2
-      setFlag: 
+      setFlag: mattew_isolated
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
     - label: RECOVER
       result: Recover sick person
       survival: -1
       science: 0
       morale: 1
+      setFlag: cured
+      requirements:
+      - kind: 0
+        tag: 5
+        role: 0
+        flag: 
+        stat: 0
+        value: 0
+      lockHint: NO... NEEDS MEDIC
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: patient_dies
+    title: THE COUGH STOPS
+    body: For three days the coughing kept everyone awake. On the fourth, it stopped.
+    causeLine: Mattew was sick when you took him aboard.
+    conditions:
+    - kind: 0
+      tag: 7
+      role: 5
+      flag: sick
+      stat: 0
+      value: 0
+    - kind: 7
+      tag: 7
+      role: 5
+      flag: cured
+      stat: 0
+      value: 0
+    - kind: 2
+      tag: 7
+      role: 5
+      flag: mattew_isolated
+      stat: 0
+      value: 0
+    minTurn: 3
+    maxTurn: 99
+    priority: 5
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: SIT WITH HIM
+      result: By morning the bunk is empty. You fold the blanket and say nothing.
+      survival: -1
+      science: 0
+      morale: -1
       setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 1
+        cardId: mattew_sick
+        tag: 7
+        role: 0
   endings:
   - id: default
     title: THE LAST VOYAGE

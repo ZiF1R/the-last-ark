@@ -10,6 +10,7 @@ public class DraftSystem
 		foreach (CardDef card in db.cards)
 		{
 			if (state.crew.Contains(card)) continue;
+			if (state.lostCrew.Contains(card)) continue;
 
 			// if there are only cards with 2 slots cost, empty slot remaining //! fix
 			if (card.slotCost > state.SlotsLeft) continue;

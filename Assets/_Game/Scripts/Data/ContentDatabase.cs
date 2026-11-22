@@ -9,7 +9,9 @@ public class ContentDatabase : ScriptableObject
 	public List<CardDef> cards = new();
 	public List<EventDef> events = new();
 	public List<EndingDef> endings = new();
+	public List<SynergyDef> synergies = new();
 
+	public SynergyDef GetSynergy(string id) => synergies.Find(s => s.id == id);
 	public CardDef GetCard(string id) => cards.Find(c => c.id == id);
 	public EventDef GetEvent(string id) => events.Find(c => c.id == id);
 	public EndingDef GetEnding(string id) => endings.Find(c => c.id == id);
@@ -71,10 +73,37 @@ public class ContentDatabase : ScriptableObject
 			if (c.icon == null)
 				warnings.Add($"{where}: не назначена иконка.");
 
+			bool hasDelayed = c.delayed != null && !c.delayed.IsEmpty;
 			bool doesNothing = c.survival == 0 && c.science == 0 && c.morale == 0
-							   && string.IsNullOrWhiteSpace(c.eventOnPickId);
+				&& c.passiveSurvival == 0 && c.passiveScience == 0 && c.passiveMorale == 0
+				&& !hasDelayed
+				&& string.IsNullOrWhiteSpace(c.eventOnPickId);
+
 			if (doesNothing)
 				warnings.Add($"{where}: карта ничего не делает (все дельты 0 и нет события).");
+
+			if (c.delayed != null && !c.delayed.IsEmpty)
+			{
+				if (c.delayed.turns < 1)
+					errors.Add($"{where}: delayed.turns = {c.delayed.turns}, должен быть >= 1.");
+
+				if (c.delayed.turns > 4)
+					warnings.Add($"{where}: delayed.turns = {c.delayed.turns} — игрок может не дожить до срабатывания.");
+
+				int delayedPower = Mathf.Abs(c.delayed.survival)
+								 + Mathf.Abs(c.delayed.science)
+								 + Mathf.Abs(c.delayed.morale);
+
+				if (delayedPower > 3)
+					warnings.Add($"{where}: отложенный эффект {delayedPower} пункта — проверь баланс.");
+			}
+
+			if (c.passivePeriod < 1)
+				errors.Add($"{where}: passivePeriod = {c.passivePeriod}, должен быть >= 1.");
+
+			int passivePower = Mathf.Abs(c.passiveSurvival) + Mathf.Abs(c.passiveScience) + Mathf.Abs(c.passiveMorale);
+			if (passivePower > 2)
+				warnings.Add($"{where}: пассив {passivePower} пункта за тик — проверь баланс.");
 
 			if (!string.IsNullOrWhiteSpace(c.eventOnPickId) && GetEvent(c.eventOnPickId) == null)
 				errors.Add($"{where}: eventOnPickId '{c.eventOnPickId}' не найден в events.");
@@ -119,34 +148,82 @@ public class ContentDatabase : ScriptableObject
 							 "будет выпадать после каждого хода.");
 			}
 
-			if (e.choices == null || e.choices.Length != 2)
+			if (e.choices == null || e.choices.Length < 1 || e.choices.Length > 2)
 			{
-				errors.Add($"{where}: нужно ровно 2 варианта, сейчас {(e.choices?.Length ?? 0)}.");
+				errors.Add($"{where}: нужно 1 или 2 варианта, сейчас {(e.choices?.Length ?? 0)}.");
 				continue;
 			}
+
+			bool anyUnconditional = false;
+			foreach (Choice c in e.choices)
+				if (c != null && (c.requirements == null || c.requirements.Length == 0))
+					anyUnconditional = true;
+
+			if (!anyUnconditional)
+				errors.Add($"{where}: все варианты условные — возможен софтлок.");
 
 			for (int j = 0; j < e.choices.Length; j++)
 			{
 				Choice ch = e.choices[j];
 				if (ch == null) { errors.Add($"{where}, Choice[{j}]: null."); continue; }
 
+				if (ch.requirements != null)
+					foreach (var r in ch.requirements)
+						if (r == null) errors.Add($"{where}, Choice[{j}]: null-требование.");
+
 				if (string.IsNullOrWhiteSpace(ch.label))
 					errors.Add($"{where}, Choice[{j}]: пустой label.");
 
-				if (ch.survival == 0 && ch.science == 0 && ch.morale == 0 && string.IsNullOrWhiteSpace(ch.setFlag))
+				bool changesStats = ch.survival != 0 || ch.science != 0 || ch.morale != 0;
+				bool setsFlag = !string.IsNullOrWhiteSpace(ch.setFlag);
+				bool removesCrew = ch.removal != null && ch.removal.IsActive;
+
+				if (!changesStats && !setsFlag && !removesCrew)
 					warnings.Add($"{where}, Choice[{j}]: вариант ничего не меняет.");
+
+				if (removesCrew)
+					ValidateRemoval(e, ch, j, where, errors, warnings);
 			}
 
-			Choice a = e.choices[0], b = e.choices[1];
-			if (a != null && b != null
-				&& a.label == b.label
-				&& a.survival == b.survival
-				&& a.science == b.science
-				&& a.morale == b.morale)
+			if (e.choices.Length == 1)
 			{
-				warnings.Add($"{where}: оба варианта идентичны — выбор без выбора.");
+				Choice only = e.choices[0];
+
+				if (only != null && string.IsNullOrWhiteSpace(only.result))
+					warnings.Add($"{where}: событие без выбора, но result пуст — игрок не увидит последствий.");
+
+				if (!e.once)
+					warnings.Add($"{where}: событие без выбора с once = false будет повторяться каждый подходящий ход.");
+			}
+
+			if (e.choices.Length == 2)
+			{
+				Choice c1 = e.choices[0], c2 = e.choices[1];
+
+				bool aRemoves = c1?.removal != null && c1.removal.IsActive;
+				bool bRemoves = c2?.removal != null && c2.removal.IsActive;
+
+				bool sameRemoval = aRemoves == bRemoves;
+				if (sameRemoval && aRemoves)
+					sameRemoval = c1.removal.selector == c2.removal.selector
+							   && c1.removal.tag == c2.removal.tag
+							   && c1.removal.role == c2.removal.role;
+
+				if (c1 != null && c2 != null
+					&& c1.label == c2.label
+					&& c1.survival == c2.survival
+					&& c1.science == c2.science
+					&& c1.morale == c2.morale
+					&& sameRemoval)
+				{
+					warnings.Add($"{where}: оба варианта идентичны — выбор без выбора.");
+				}
 			}
 		}
+
+		int beatCount = events.Count(x => x != null && x.choices != null && x.choices.Length == 1);
+		if (beatCount > 2)
+			warnings.Add($"Событий без выбора: {beatCount}. Рекомендуется 1–2 на ран.");
 
 		foreach (var g in events.Where(e => e != null).GroupBy(e => e.id).Where(g => g.Count() > 1))
 			errors.Add($"Event: id '{g.Key}' встречается {g.Count()} раз.");
@@ -215,7 +292,7 @@ public class ContentDatabase : ScriptableObject
 				}
 
 				if (e?.conditions == null) continue;
-				foreach (EventCondition c in e.conditions)
+				foreach (StateCondition c in e.conditions)
 				{
 					if (c == null) continue;
 
@@ -268,7 +345,7 @@ public class ContentDatabase : ScriptableObject
 		var statMin = new Dictionary<StatKind, int>();
 		var statMax = new Dictionary<StatKind, int>();
 
-		foreach (EventCondition c in e.conditions)
+		foreach (StateCondition c in e.conditions)
 		{
 			if (c == null) { errors.Add($"Event '{e.id}': null-условие."); continue; }
 
@@ -320,5 +397,70 @@ public class ContentDatabase : ScriptableObject
 
 		if (e.weight <= 0 && e.priority <= 0)
 			warnings.Add($"Event '{e.id}': weight <= 0 и priority = 0 — событие не будет выбрано никогда.");
+	}
+
+	private void ValidateRemoval(EventDef e, Choice ch, int index, string where,
+							 List<string> errors, List<string> warnings)
+	{
+		CrewRemoval r = ch.removal;
+		if (r == null || !r.IsActive) return;
+
+		string at = $"{where}, Choice[{index}]";
+
+		if (r.selector == CrewSelector.ById)
+		{
+			bool exists = cards != null && cards.Any(c => c != null && c.id == r.cardId);
+
+			if (!exists)
+				errors.Add($"{at}: removal по id '{r.cardId}', но такой карты нет в базе.");
+		} else if (r.selector == CrewSelector.ByTag)
+		{
+			bool tagExists = cards != null && cards.Any(c => c != null
+				&& c.tags != null && c.tags.Contains(r.tag));
+
+			if (!tagExists)
+				errors.Add($"{at}: removal по тегу {r.tag}, но ни у одной карты нет этого тега.");
+
+			bool guaranteed = ConditionsMentionTag(e.conditions, r.tag)
+						   || ConditionsMentionTag(ch.requirements, r.tag);
+
+			if (!guaranteed)
+				warnings.Add($"{at}: removal по тегу {r.tag}, но ни условие события, ни требование варианта не гарантируют наличие такого члена экипажа.");
+		}
+		else if (r.selector == CrewSelector.ByRole)
+		{
+			bool roleExists = cards != null && cards.Any(c => c != null && c.role == r.role);
+
+			if (!roleExists)
+				errors.Add($"{at}: removal по роли {r.role}, но ни у одной карты нет этой роли.");
+
+			bool guaranteed = ConditionsMentionRole(e.conditions, r.role)
+						   || ConditionsMentionRole(ch.requirements, r.role);
+
+			if (!guaranteed)
+				warnings.Add($"{at}: removal по роли {r.role}, но ни условие события, ни требование варианта не гарантируют наличие такого члена экипажа.");
+		}
+	}
+
+	private static bool ConditionsMentionTag(StateCondition[] conditions, CardTag tag)
+	{
+		if (conditions == null) return false;
+
+		foreach (StateCondition c in conditions)
+			if (c != null && c.kind == ConditionKind.TagPresent && c.tag == tag)
+				return true;
+
+		return false;
+	}
+
+	private static bool ConditionsMentionRole(StateCondition[] conditions, CardRole role)
+	{
+		if (conditions == null) return false;
+
+		foreach (StateCondition c in conditions)
+			if (c != null && c.kind == ConditionKind.RolePresent && c.role == role)
+				return true;
+
+		return false;
 	}
 }
