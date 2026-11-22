@@ -20,6 +20,7 @@ public class GameFlow : MonoBehaviour
 	void Start()
 	{
 		_phase = Phase.Title;
+		StartRun();
 	}
 
 	[ContextMenu("Debug/Start Run")]
@@ -186,15 +187,14 @@ public class GameFlow : MonoBehaviour
 
 		if (ending == null)
 		{
-			if (db.endings.Count != 0)
-			{
-				ending = db.endings[0];
-				Debug.LogWarning($"[Epilogue] Doesn't found any ending, using default");
-			} else
+			if (db.endings == null || db.endings.Count == 0)
 			{
 				Debug.LogError($"[Epilogue] FAIL ending resolve: endings array is empty");
 				return;
 			}
+
+			ending = db.endings[0];
+			Debug.LogWarning($"[Epilogue] Doesn't found any ending, using default");
 		}
 
 		GameEvents.RaiseRunEnded(ending, _state);

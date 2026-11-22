@@ -111,6 +111,14 @@ public class ContentDatabase : ScriptableObject
 
 			ValidateEventConditions(e, errors, warnings);
 
+			if ((e.conditions == null || e.conditions.Length == 0)
+				&& !e.once
+				&& e.priority > 0)
+			{
+				warnings.Add($"Event '{e.id}': нет условий, once = false и priority > 0 — " +
+							 "будет выпадать после каждого хода.");
+			}
+
 			if (e.choices == null || e.choices.Length != 2)
 			{
 				errors.Add($"{where}: нужно ровно 2 варианта, сейчас {(e.choices?.Length ?? 0)}.");

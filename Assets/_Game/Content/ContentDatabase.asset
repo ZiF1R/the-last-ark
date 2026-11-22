@@ -82,7 +82,7 @@ MonoBehaviour:
     survival: -2
     science: 1
     morale: 0
-    eventOnPickId: 
+    eventOnPickId: cough
     <weight>k__BackingField: 10
     icon: {fileID: 0}
   - id: lize_farmer
@@ -97,11 +97,64 @@ MonoBehaviour:
     eventOnPickId: 
     <weight>k__BackingField: 10
     icon: {fileID: 0}
-  events: []
+  events:
+  - id: test_event
+    title: 'TEST EVENT '
+    body: Something happened.
+    causeLine: Because you are testing
+    conditions: []
+    minTurn: 1
+    maxTurn: 100
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: LEFT
+      result: You chose left.
+      survival: 0
+      science: 0
+      morale: 0
+      setFlag: 
+    - label: RIGHT
+      result: You chose right.
+      survival: 0
+      science: 0
+      morale: 0
+      setFlag: 
+  - id: cough
+    title: COUGH BEHIND WALL
+    body: Something happened.
+    causeLine: You are choosed sick person
+    conditions:
+    - kind: 0
+      tag: 7
+      role: 5
+      flag: sick
+      stat: 0
+      value: 0
+    minTurn: 1
+    maxTurn: 100
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: ISOLATE
+      result: Isolate sick person
+      survival: 0
+      science: 0
+      morale: -2
+      setFlag: 
+    - label: RECOVER
+      result: Recover sick person
+      survival: -1
+      science: 0
+      morale: 1
+      setFlag: 
   endings:
   - id: default
-    title: The End
-    body: The Last Flight
+    title: THE LAST VOYAGE
+    body: 'The ark leaves with what it has: enough to survive, not enough to be sure.
+      Behind you, Earth is quiet. Ahead, a small green dot. It will have to do.'
     priority: 0
     minSurvival: 0
     minScience: 0
@@ -114,8 +167,10 @@ MonoBehaviour:
     requiredTags: 
     forbiddenTags: 
   - id: dead_survival
-    title: Death
-    body: The Ark fell silent on the third day.
+    title: THE LIGHTS GO OUT
+    body: The recyclers died on the fourth day. After that you counted the breaths.
+      There were fewer every hour. The ark is still out there, drifting, full of
+      people who no longer need anything.
     priority: 100
     minSurvival: -10
     minScience: 0
@@ -128,8 +183,9 @@ MonoBehaviour:
     requiredTags: 
     forbiddenTags: 
   - id: dead_science
-    title: Death
-    body: The systems failed, and no one knew how to fix them.
+    title: NO ONE REMEMBERS HOW
+    body: The reactor failed at 03:14. Everyone stood in the corridor, waiting for
+      someone who knew what to do. Nobody did. The ark became a very expensive coffin.
     priority: 100
     minSurvival: 0
     minScience: -10
@@ -141,9 +197,26 @@ MonoBehaviour:
     forbiddenFlags: []
     requiredTags: 
     forbiddenTags: 
+  - id: dead_morale
+    title: THE CREW STOPS LISTENING
+    body: They stopped answering on the third day. By the sixth, the bridge was empty.
+      The ark sails on, but there is no one left who wants to arrive.
+    priority: 100
+    minSurvival: 0
+    minScience: 0
+    minMorale: -10
+    maxSurvival: 10
+    maxScience: 10
+    maxMorale: 0
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 
+    forbiddenTags: 
   - id: eden
-    title: New Eden
-    body: Everyone lived happily ever after
+    title: NEW EDEN
+    body: The door opens on soil that has never been farmed. Someone laughs. A child
+      runs ahead before anyone can stop her. For the first time in nine days, nobody
+      is counting.
     priority: 50
     minSurvival: 7
     minScience: 7

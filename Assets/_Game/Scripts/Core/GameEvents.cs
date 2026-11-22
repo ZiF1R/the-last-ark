@@ -27,6 +27,7 @@ public static class GameEvents
 		StatsChanged = null;
 		CrewChanged = null;
 		EventTriggered = null;
+		EventResolved = null;
 		RunEnded = null;
 	}
 
