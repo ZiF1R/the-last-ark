@@ -6,6 +6,7 @@
 # See: https://github.com/github/gitignore/tree/main/Global
 #
 
+*.txt
 Tiny Loop Jam 2026 - The Last Ark.md
 
 .utmp/

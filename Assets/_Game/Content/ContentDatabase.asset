@@ -23,7 +23,7 @@ MonoBehaviour:
     science: 0
     morale: -1
     eventOnPickId: 
-    weight: 10
+    <weight>k__BackingField: 10
     icon: {fileID: 0}
   - id: maria_biologist
     displayName: Maria
@@ -35,7 +35,7 @@ MonoBehaviour:
     science: 2
     morale: 0
     eventOnPickId: 
-    weight: 10
+    <weight>k__BackingField: 10
     icon: {fileID: 0}
   - id: dan_soldier
     displayName: Dan
@@ -47,7 +47,7 @@ MonoBehaviour:
     science: 0
     morale: -1
     eventOnPickId: 
-    weight: 10
+    <weight>k__BackingField: 10
     icon: {fileID: 0}
   - id: kira_medic
     displayName: Kira
@@ -59,7 +59,7 @@ MonoBehaviour:
     science: 0
     morale: 1
     eventOnPickId: 
-    weight: 10
+    <weight>k__BackingField: 10
     icon: {fileID: 0}
   - id: sam_kid
     displayName: Sam
@@ -71,7 +71,7 @@ MonoBehaviour:
     science: 0
     morale: 2
     eventOnPickId: 
-    weight: 10
+    <weight>k__BackingField: 10
     icon: {fileID: 0}
   - id: mattew_sick
     displayName: Mattew
@@ -83,7 +83,7 @@ MonoBehaviour:
     science: 1
     morale: 0
     eventOnPickId: 
-    weight: 10
+    <weight>k__BackingField: 10
     icon: {fileID: 0}
   - id: lize_farmer
     displayName: Lize
@@ -95,17 +95,59 @@ MonoBehaviour:
     science: 0
     morale: 0
     eventOnPickId: 
-    weight: 10
+    <weight>k__BackingField: 10
     icon: {fileID: 0}
   events: []
   endings:
-  - id: 0
-    title: Default
-    body: Default
+  - id: default
+    title: The End
+    body: The Last Flight
     priority: 0
     minSurvival: 0
     minScience: 0
     minMorale: 0
+    maxSurvival: 10
+    maxScience: 10
+    maxMorale: 10
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 
+    forbiddenTags: 
+  - id: dead_survival
+    title: Death
+    body: The Ark fell silent on the third day.
+    priority: 100
+    minSurvival: -10
+    minScience: 0
+    minMorale: 0
+    maxSurvival: 0
+    maxScience: 10
+    maxMorale: 10
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 
+    forbiddenTags: 
+  - id: dead_science
+    title: Death
+    body: The systems failed, and no one knew how to fix them.
+    priority: 100
+    minSurvival: 0
+    minScience: -10
+    minMorale: 0
+    maxSurvival: 10
+    maxScience: 0
+    maxMorale: 10
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 
+    forbiddenTags: 
+  - id: eden
+    title: New Eden
+    body: Everyone lived happily ever after
+    priority: 50
+    minSurvival: 7
+    minScience: 7
+    minMorale: 7
     maxSurvival: 10
     maxScience: 10
     maxMorale: 10

@@ -8,13 +8,13 @@ public class GameFlow : MonoBehaviour
 	public ContentDatabase db;
 	// views referenses
 
-	enum Phase { Title, Draft, Resolve, Event, Epilogue }
+	enum Phase { Title, Draft, Resolve, Event, EventResult, Epilogue }
 	static readonly int[] DriftTurns = { 2, 4, 6 };
 
 	RunState _state;
 	List<CardDef> _offer;
 	readonly DraftSystem _draftSystem = new();
-	readonly EventSystem _eventSystem = new();
+	readonly EventPicker _eventSystem = new();
 	Phase _phase;
 
 	void Start()
@@ -55,7 +55,8 @@ public class GameFlow : MonoBehaviour
 		if (DriftTurns.Contains(_state.turn))
 		{
 			GameEvents.RaiseStatsChanged(
-				_state.ApplyStats(-1, 0, 0)
+				_state.ApplyStats(-1, 0, 0),
+				_state
 			);
 		}
 
@@ -89,6 +90,7 @@ public class GameFlow : MonoBehaviour
 
 		StatDelta delta = EffectResolver.ApplyCard(card, _state);
 		_state.crew.Add(card);
+		_state.leftBehind.Remove(card);
 		_state.leftBehind.AddRange(
 			_offer.FindAll(c =>
 				c.id != card.id &&
@@ -96,7 +98,7 @@ public class GameFlow : MonoBehaviour
 			)
 		);
 
-		GameEvents.RaiseStatsChanged(delta);
+		GameEvents.RaiseStatsChanged(delta, _state);
 		GameEvents.RaiseCrewChanged(_state);
 
 		if (_state.IsDead)
@@ -140,6 +142,7 @@ public class GameFlow : MonoBehaviour
 		if (e.choices.Length < 2)
 		{
 			Debug.LogError($"[ShowEvent] Event with id={e.id} doesn't have enough choices");
+			EnterDraft();
 			return;
 		}
 
@@ -153,12 +156,19 @@ public class GameFlow : MonoBehaviour
 	{
 		if (_phase != Phase.Event) return;
 
+		_phase = Phase.EventResult;
 		StatDelta delta = _state.ApplyStats(choice.survival, choice.science, choice.morale);
 
 		if (!string.IsNullOrEmpty(choice.setFlag))
 			_state.flags.Add(choice.setFlag);
 
-		GameEvents.RaiseStatsChanged(delta);
+		GameEvents.RaiseStatsChanged(delta, _state);
+		GameEvents.RaiseEventResolved(choice);
+	}
+
+	public void ContinueAfterEvent()
+	{
+		if (_phase != Phase.EventResult) return;
 
 		if (_state.IsDead || _state.IsFull)
 		{
@@ -183,9 +193,8 @@ public class GameFlow : MonoBehaviour
 			} else
 			{
 				Debug.LogError($"[Epilogue] FAIL ending resolve: endings array is empty");
+				return;
 			}
-
-			return; //!
 		}
 
 		GameEvents.RaiseRunEnded(ending, _state);

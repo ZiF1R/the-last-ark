@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-public class EventSystem
+public class EventPicker
 {
 	public EventDef PickEvent(RunState state, ContentDatabase db)
 	{
