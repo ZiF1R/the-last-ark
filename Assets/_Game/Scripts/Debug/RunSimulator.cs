@@ -22,7 +22,7 @@ public static class RunSimulator
 		Debug.Log($"<b>[Sim] {runs} ранов на политику, seed {seed}, оффер {OFFER_SIZE}</b>");
 
 		Simulate(db, runs, seed, draft, PickRandom, "RANDOM — случайный игрок");
-		Simulate(db, runs, seed, draft, PickGreedy, "GREEDY — аккуратный игрок");
+		Simulate(db, runs, seed, draft, (offer, st) => PickGreedy(offer, st, db), "GREEDY — аккуратный игрок");
 	}
 
 	// ------------------------------------------------------------------
@@ -36,9 +36,11 @@ public static class RunSimulator
 		var endingCount = new Dictionary<string, int>();
 		var pickedCards = new HashSet<CardDef>();
 		var deathCause = new Dictionary<string, int>();
+		var synergyCount = new Dictionary<string, int>();
 
 		int deaths = 0, noEnding = 0, slotBlocked = 0, poolEmpty = 0;
 		int totalTurns = 0, sumS = 0, sumSc = 0, sumM = 0;
+		int synergyFires = 0;
 
 		for (int r = 0; r < runs; r++)
 		{
@@ -52,9 +54,7 @@ public static class RunSimulator
 
 				List<CardDef> offer = draft.BuildOffer(st, db, OFFER_SIZE);
 
-				// Карта, которая не влезает в оставшиеся места, не предлагается.
-				// TODO: этот же фильтр должен жить в DraftSystem.BuildOffer, иначе игра
-				// предложит ребёнка (2 места), когда свободно одно.
+				// DraftSystem уже фильтрует по слотам; оставляем как страховку.
 				int offeredBeforeSlotFilter = offer.Count;
 				offer.RemoveAll(c => c.slotCost > st.SlotsLeft);
 
@@ -73,6 +73,17 @@ public static class RunSimulator
 				EffectResolver.ApplyCard(chosen, st);
 				st.crew.Add(chosen);
 				pickedCards.Add(chosen);
+
+				var fired = SynergySystem.Evaluate(st, db);
+				synergyFires += fired.Count;
+
+				foreach (var (rule, _) in fired)
+				{
+					string key = string.IsNullOrWhiteSpace(rule.id) ? "(no id)" : rule.id;
+
+					synergyCount.TryGetValue(key, out int n);
+					synergyCount[key] = n + 1;
+				}
 
 				st.pendingEventId = null;   // события в симуляции не обрабатываются
 			}
@@ -95,13 +106,14 @@ public static class RunSimulator
 			EndingDef ending = EndingResolver.Resolve(st, db);
 			if (ending == null) { noEnding++; continue; }
 
-			string key = IdOf(ending);
-			endingCount.TryGetValue(key, out int count);
-			endingCount[key] = count + 1;
+			string key2 = IdOf(ending);
+			endingCount.TryGetValue(key2, out int count);
+			endingCount[key2] = count + 1;
 		}
 
 		Report(db, runs, label, endingCount, pickedCards, deathCause,
-			   deaths, noEnding, slotBlocked, poolEmpty, totalTurns, sumS, sumSc, sumM);
+			   deaths, noEnding, slotBlocked, poolEmpty, totalTurns, sumS, sumSc, sumM,
+			   synergyFires, synergyCount);
 	}
 
 	// ------------------------------------------------------------------
@@ -109,17 +121,22 @@ public static class RunSimulator
 					   Dictionary<string, int> endingCount, HashSet<CardDef> pickedCards,
 					   Dictionary<string, int> deathCause,
 					   int deaths, int noEnding, int slotBlocked, int poolEmpty,
-					   int totalTurns, int sumS, int sumSc, int sumM)
+					   int totalTurns, int sumS, int sumSc, int sumM,
+					   int synergyFires, Dictionary<string, int> synergyCount)
 	{
 		Debug.Log($"<b>[Sim] {label}</b>");
 
 		string causes = deaths > 0
 			? $" ({string.Join(", ", deathCause.Select(kv => $"{kv.Key} {kv.Value}"))})"
 			: "";
+
 		Debug.Log($"[Sim]   средняя длина {totalTurns / (float)runs:F1} ходов, " +
 				  $"смертей {100f * deaths / runs:F1}%{causes}");
+
 		Debug.Log($"[Sim]   средние статы: Выж {sumS / (float)runs:F1}  " +
 				  $"Наука {sumSc / (float)runs:F1}  Мор {sumM / (float)runs:F1}");
+
+		Debug.Log($"[Sim]   синергий за ран: {synergyFires / (float)runs:F2} (всего {synergyFires})");
 
 		if (noEnding > 0)
 			Debug.LogError($"[Sim]   {noEnding} ранов ({100f * noEnding / runs:F1}%) без концовки — " +
@@ -135,7 +152,21 @@ public static class RunSimulator
 		foreach (var kv in endingCount.OrderByDescending(kv => kv.Value))
 			Debug.Log($"[Sim]   {kv.Key,-26} {kv.Value,5}   {100f * kv.Value / runs,5:F1}%");
 
-		var neverPicked = db.cards.Where(c => !pickedCards.Contains(c)).Select(c => c.id).ToList();
+		if (db.synergies != null && db.synergies.Count > 0)
+		{
+			foreach (var kv in synergyCount.OrderByDescending(kv => kv.Value))
+				Debug.Log($"[Sim]   synergy {kv.Key,-28} {kv.Value,5}   {100f * kv.Value / runs,5:F1}% ранов");
+
+			var neverFired = db.synergies
+				.Where(s => s != null && !string.IsNullOrWhiteSpace(s.id) && !synergyCount.ContainsKey(s.id))
+				.Select(s => s.id)
+				.ToList();
+
+			if (neverFired.Count > 0)
+				Debug.LogWarning($"[Sim]   ни разу не сработали синергии: {string.Join(", ", neverFired)}");
+		}
+
+		var neverPicked = db.cards.Where(c => c != null && !pickedCards.Contains(c)).Select(c => c.id).ToList();
 		if (neverPicked.Count > 0)
 			Debug.LogWarning($"[Sim]   ни разу не выбраны: {string.Join(", ", neverPicked)}");
 
@@ -144,12 +175,14 @@ public static class RunSimulator
 			.Where(e => e != null && !reached.Contains(IdOf(e)))
 			.Select(e => e.id)
 			.ToList();
+
 		if (missed.Count > 0)
 			Debug.LogWarning($"[Sim]   недостигнутые концовки: {string.Join(", ", missed)}");
 
 		if (endingCount.Count > 0)
 		{
 			var top = endingCount.OrderByDescending(kv => kv.Value).First();
+
 			if (top.Value > runs * 0.6f)
 				Debug.LogWarning($"[Sim]   «{top.Key}» занимает {100f * top.Value / runs:F0}% — " +
 								 "остальные концовки почти не видны.");
@@ -157,6 +190,7 @@ public static class RunSimulator
 
 		if (deaths > runs * 0.4f)
 			Debug.LogWarning("[Sim]   смертность выше 40% — слишком жёстко.");
+
 		if (deaths < runs * 0.02f)
 			Debug.LogWarning("[Sim]   смертность ниже 2% — ставок нет, выбор не ощущается.");
 	}
@@ -166,7 +200,7 @@ public static class RunSimulator
 	static CardDef PickRandom(List<CardDef> offer, RunState st)
 		=> offer[Random.Range(0, offer.Count)];
 
-	static CardDef PickGreedy(List<CardDef> offer, RunState st)
+	static CardDef PickGreedy(List<CardDef> offer, RunState st, ContentDatabase db)
 	{
 		CardDef best = offer[0];
 		int bestScore = int.MinValue;
@@ -177,9 +211,22 @@ public static class RunSimulator
 			int dsc = c.delayed != null ? c.delayed.science : 0;
 			int dm = c.delayed != null ? c.delayed.morale : 0;
 
-			int s = Mathf.Clamp(st.survival + c.survival + ds, 0, 10);
-			int sc = Mathf.Clamp(st.science + c.science + dsc, 0, 10);
-			int m = Mathf.Clamp(st.morale + c.morale + dm, 0, 10);
+			int ps = c.survival + ds;
+			int psc = c.science + dsc;
+			int pm = c.morale + dm;
+
+			// Greedy учитывает синергии, которые карта завершит.
+			// Это приближение: все дельты складываются до клампа.
+			foreach (SynergyDef rule in SynergySystem.Preview(st, db, c))
+			{
+				ps += rule.survival;
+				psc += rule.science;
+				pm += rule.morale;
+			}
+
+			int s = Mathf.Clamp(st.survival + ps, 0, 10);
+			int sc = Mathf.Clamp(st.science + psc, 0, 10);
+			int m = Mathf.Clamp(st.morale + pm, 0, 10);
 
 			// Сначала «не умереть» (минимальная стата), потом суммарная полезность.
 			int lowest = Mathf.Min(s, Mathf.Min(sc, m));

@@ -15,6 +15,7 @@ public class GameFlow : MonoBehaviour
 	readonly DraftSystem _draftSystem = new();
 	readonly EventPicker _eventSystem = new();
 	Phase _phase;
+	public RunState State => _state;
 
 	void Start()
 	{
@@ -31,8 +32,10 @@ public class GameFlow : MonoBehaviour
 	[ContextMenu("Import Seed")]
 	void ImportSeed()
 	{
-		//db.cards = ContentSeed.Cards;
-		//db.events = ContentSeed.Events;
+		db.cards = ContentSeed.Cards;
+		db.events = ContentSeed.Events;
+		db.endings = ContentSeed.Endings;
+		db.synergies = ContentSeed.Synergies;
 	}
 
 	public void StartRun()
@@ -90,7 +93,7 @@ public class GameFlow : MonoBehaviour
 
 		_phase = Phase.Resolve;
 
-		StatDelta delta = EffectResolver.ApplyCard(card, _state);
+		StatDelta cardDelta = EffectResolver.ApplyCard(card, _state);
 		_state.crew.Add(card);
 		_state.leftBehind.Remove(card);
 		_state.leftBehind.AddRange(
@@ -100,12 +103,27 @@ public class GameFlow : MonoBehaviour
 			)
 		);
 
-		GameEvents.RaiseStatsChanged(delta, _state);
+		GameEvents.RaiseStatsChanged(cardDelta, _state);
 		GameEvents.RaiseCrewChanged(_state);
 
 		var synergies = SynergySystem.Evaluate(_state, db);
-		foreach (var (rule, d) in synergies)
-			GameEvents.RaiseSynergyFired(rule, d, _state);
+
+		if (synergies.Count > 0)
+		{
+			StatDelta synergyDelta = new(0, 0, 0);
+
+			foreach (var (_, d) in synergies)
+			{
+				synergyDelta.survival += d.survival;
+				synergyDelta.science += d.science;
+				synergyDelta.morale += d.morale;
+			}
+
+			GameEvents.RaiseStatsChanged(synergyDelta, _state);
+
+			foreach (var (rule, d) in synergies)
+				GameEvents.RaiseSynergyFired(rule, d, _state);
+		}
 
 		if (_state.IsDead)
 		{

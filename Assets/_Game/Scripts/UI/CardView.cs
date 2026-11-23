@@ -14,13 +14,18 @@ public class CardView : MonoBehaviour
 	[SerializeField] TMP_Text roleText;
 	[SerializeField] TMP_Text quoteText;
 	[SerializeField] TMP_Text effectsText;
+	[SerializeField] TMP_Text tagsText;
 	[SerializeField] GameObject costBadge;
 	[SerializeField] TMP_Text costText;
 	[SerializeField] Button button;
 
+	[Header("Tag Colors")]
+	[SerializeField] Color tagColor = new Color(0.35f, 0.37f, 0.36f);
+	[SerializeField] Color tagResonanceColor = new Color(0.72f, 0.52f, 0.16f);
+
 	Action<CardDef> _onClick;
 
-	public void Setup(CardDef card, Action<CardDef> onClick)
+	public void Setup(CardDef card, Action<CardDef> onClick, RunState state = null)
 	{
 		_onClick = onClick;
 
@@ -28,6 +33,13 @@ public class CardView : MonoBehaviour
 		roleText.text = card.role.ToString().ToUpperInvariant();
 		quoteText.text = card.quote;
 		effectsText.text = BuildEffects(card);
+
+		if (tagsText != null)
+		{
+			string tags = BuildTags(card, state);
+			tagsText.text = tags;
+			tagsText.gameObject.SetActive(!string.IsNullOrEmpty(tags));
+		}
 
 		bool hasIcon = card.icon != null;
 		icon.enabled = true;
@@ -41,6 +53,23 @@ public class CardView : MonoBehaviour
 
 		button.onClick.RemoveAllListeners();
 		button.onClick.AddListener(() => _onClick?.Invoke(card));
+	}
+
+	string BuildTags(CardDef card, RunState state)
+	{
+		if (card.tags == null || card.tags.Length == 0) return "";
+
+		var parts = new List<string>(card.tags.Length);
+
+		foreach (CardTag tag in card.tags)
+		{
+			bool resonates = state != null && state.HasTag(tag);
+			Color color = resonates ? tagResonanceColor : tagColor;
+
+			parts.Add($"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{tag.ToString().ToUpperInvariant()}</color>");
+		}
+
+		return string.Join("  ·  ", parts);
 	}
 
 	static string BuildEffects(CardDef c)

@@ -132,6 +132,7 @@ public class RunState
 
 		foreach (CardDef card in crew)
 		{
+			if (card == null || card.tags == null) continue;
 			tags.AddRange(card.tags);
 		}
 

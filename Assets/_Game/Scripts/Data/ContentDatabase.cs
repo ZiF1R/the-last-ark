@@ -11,10 +11,15 @@ public class ContentDatabase : ScriptableObject
 	public List<EndingDef> endings = new();
 	public List<SynergyDef> synergies = new();
 
-	public SynergyDef GetSynergy(string id) => synergies.Find(s => s.id == id);
-	public CardDef GetCard(string id) => cards.Find(c => c.id == id);
-	public EventDef GetEvent(string id) => events.Find(c => c.id == id);
-	public EndingDef GetEnding(string id) => endings.Find(c => c.id == id);
+	public CardDef GetCard(string id)
+		=> cards?.Find(c => c != null && c.id == id);
+	public EventDef GetEvent(string id)
+		=> events?.Find(e => e != null && e.id == id);
+	public EndingDef GetEnding(string id)
+		=> endings?.Find(e => e != null && e.id == id);
+	public SynergyDef GetSynergy(string id)
+	=> synergies?.Find(s => s != null && s.id == id);
+
 
 	[ContextMenu("Validate")]
 	public void Validate()
@@ -25,12 +30,14 @@ public class ContentDatabase : ScriptableObject
 		ValidateCards(errors, warnings);
 		ValidateEvents(errors, warnings);
 		ValidateEndings(errors, warnings);
+		ValidateSynergies(errors, warnings);
 		ValidateFlags(errors, warnings);
 
 		foreach (string w in warnings) Debug.LogWarning($"[Content] {w}", this);
 		foreach (string e in errors) Debug.LogError($"[Content] {e}", this);
 
-		string summary = $"cards={cards?.Count ?? 0}, events={events?.Count ?? 0}, endings={endings?.Count ?? 0}";
+		string summary = $"cards={cards?.Count ?? 0}, events={events?.Count ?? 0}, " +
+						 $"endings={endings?.Count ?? 0}, synergies={synergies?.Count ?? 0}";
 
 		if (errors.Count == 0 && warnings.Count == 0)
 			Debug.Log($"[Content] OK ({summary})", this);
@@ -276,28 +283,144 @@ public class ContentDatabase : ScriptableObject
 	}
 
 	// ------------------------------------------------------------------
+	private void ValidateSynergies(List<string> errors, List<string> warnings)
+	{
+		if (synergies == null || synergies.Count == 0)
+		{
+			warnings.Add("synergies пуст — теги не дают бонусов, система синергий не участвует в игре.");
+			return;
+		}
+
+		var ids = new HashSet<string>();
+		var combos = new HashSet<string>();
+
+		for (int i = 0; i < synergies.Count; i++)
+		{
+			SynergyDef s = synergies[i];
+			string where = $"Synergy[{i}]";
+
+			if (s == null) { errors.Add($"{where}: null-элемент в списке."); continue; }
+
+			if (string.IsNullOrWhiteSpace(s.id))
+			{
+				errors.Add($"{where}: пустой id.");
+			}
+			else
+			{
+				where = $"Synergy '{s.id}'";
+
+				if (!ids.Add(s.id))
+					errors.Add($"{where}: id повторяется — вторая копия никогда не сработает.");
+			}
+
+			if (!System.Enum.IsDefined(typeof(CardTag), s.tagA))
+				errors.Add($"{where}: tagA = {(int)s.tagA} — нет такого CardTag.");
+
+			if (!System.Enum.IsDefined(typeof(CardTag), s.tagB))
+				errors.Add($"{where}: tagB = {(int)s.tagB} — нет такого CardTag.");
+
+			if (s.countB < 1)
+				errors.Add($"{where}: countB = {s.countB}, должен быть >= 1.");
+
+			if (s.tagA == s.tagB && s.countB < 2)
+				warnings.Add($"{where}: tagA == tagB, но countB = {s.countB}. " +
+							 "Код всё равно потребует 2 — поставь 2, чтобы данные не врали.");
+
+			int needA = s.tagA == s.tagB ? Mathf.Max(2, s.countB) : 1;
+			int needB = s.tagA == s.tagB ? 0 : Mathf.Max(1, s.countB);
+
+			if (needA > RunState.MAX_SLOTS || needB > RunState.MAX_SLOTS)
+				errors.Add($"{where}: нужно больше членов экипажа, чем слотов в ковчеге ({RunState.MAX_SLOTS}).");
+
+			int cardsWithA = cards == null ? 0 : cards.Count(c =>
+				c != null && c.tags != null && c.tags.Contains(s.tagA));
+
+			int cardsWithB = s.tagA == s.tagB
+				? cardsWithA
+				: (cards == null ? 0 : cards.Count(c =>
+					c != null && c.tags != null && c.tags.Contains(s.tagB)));
+
+			if (cardsWithA < needA)
+				warnings.Add($"{where}: тег {s.tagA} есть у {cardsWithA} карт(ы), " +
+							 $"а нужно {needA} — правило недостижимо.");
+
+			if (s.tagA != s.tagB && cardsWithB < needB)
+				warnings.Add($"{where}: тег {s.tagB} есть у {cardsWithB} карт(ы), " +
+							 $"а нужно {needB} — правило недостижимо.");
+
+			if (s.tagA != s.tagB && cards != null && cards.Any(c =>
+				c != null && c.tags != null &&
+				c.tags.Contains(s.tagA) && c.tags.Contains(s.tagB)))
+			{
+				warnings.Add($"{where}: есть карта с обоими тегами ({s.tagA} + {s.tagB}) — " +
+							 "правило может сработать от одного члена экипажа.");
+			}
+
+			if (!s.HasAnyEffect)
+				warnings.Add($"{where}: правило ничего не делает (все дельты 0 и setFlag пуст).");
+
+			int power = Mathf.Abs(s.survival) + Mathf.Abs(s.science) + Mathf.Abs(s.morale);
+			if (power > 4)
+				warnings.Add($"{where}: суммарная сила {power} — проверь баланс, " +
+							 "синергия не должна решать ран одна.");
+
+			if (string.IsNullOrWhiteSpace(s.text))
+				warnings.Add($"{where}: пустой text — игрок увидит только заголовок и дельты.");
+
+			if (!string.IsNullOrWhiteSpace(s.setFlag) && !IsFlagReferenced(s.setFlag))
+				warnings.Add($"{where}: setFlag '{s.setFlag}' нигде не читается — флаг бесполезен.");
+
+			int comboCount = s.tagA == s.tagB ? Mathf.Max(2, s.countB) : Mathf.Max(1, s.countB);
+			string combo = $"{s.tagA}|{s.tagB}|{comboCount}";
+
+			if (!combos.Add(combo))
+				warnings.Add($"{where}: дубликат условия {s.tagA} + {s.tagB} × {comboCount} — " +
+							 "сработает только первое правило.");
+		}
+	}
+
+	// ------------------------------------------------------------------
 	private void ValidateFlags(List<string> errors, List<string> warnings)
 	{
 		var setFlags = new HashSet<string>();
 
+		// 1. Собираем ВСЕ флаги, которые где-либо выставляются.
 		if (events != null)
 		{
 			foreach (EventDef e in events)
 			{
 				if (e?.choices == null) continue;
+
 				foreach (Choice ch in e.choices)
-				{
 					if (!string.IsNullOrWhiteSpace(ch?.setFlag))
 						setFlags.Add(ch.setFlag);
-				}
+			}
+		}
 
-				if (e?.conditions == null) continue;
-				foreach (StateCondition c in e.conditions)
+		if (synergies != null)
+		{
+			foreach (SynergyDef s in synergies)
+				if (!string.IsNullOrWhiteSpace(s?.setFlag))
+					setFlags.Add(s.setFlag);
+		}
+
+		// 2. Только теперь проверяем все места, где флаг читается.
+		if (events != null)
+		{
+			foreach (EventDef e in events)
+			{
+				if (e == null) continue;
+
+				CheckConditions(e.conditions, $"Event '{e.id}'", setFlags, warnings);
+
+				if (e.choices == null) continue;
+
+				for (int i = 0; i < e.choices.Length; i++)
 				{
-					if (c == null) continue;
+					Choice ch = e.choices[i];
+					if (ch?.requirements == null) continue;
 
-					if (c.kind == ConditionKind.FlagSet && !setFlags.Contains(c.flag))
-						warnings.Add($"Event '{e.id}': условие FlagSet '{c.flag}' нигде не выставляется — событие не сработает.");
+					CheckConditions(ch.requirements, $"Event '{e.id}', Choice[{i}]", setFlags, warnings);
 				}
 			}
 		}
@@ -311,19 +434,96 @@ public class ContentDatabase : ScriptableObject
 			if (e.requiredFlags != null)
 			{
 				foreach (string f in e.requiredFlags)
-				{
 					if (!setFlags.Contains(f))
 						warnings.Add($"Ending '{e.id}': requiredFlag '{f}' нигде не выставляется — концовка недостижима.");
-				}
 			}
 
 			if (e.forbiddenFlags != null)
 			{
 				foreach (string f in e.forbiddenFlags)
-				{
 					if (!setFlags.Contains(f))
 						warnings.Add($"Ending '{e.id}': forbiddenFlag '{f}' нигде не выставляется — условие всегда истинно.");
+			}
+		}
+	}
+
+	private bool IsFlagReferenced(string flag)
+	{
+		if (string.IsNullOrWhiteSpace(flag)) return false;
+
+		if (events != null)
+		{
+			foreach (EventDef e in events)
+			{
+				if (e == null) continue;
+
+				if (e.conditions != null)
+				{
+					foreach (StateCondition c in e.conditions)
+					{
+						if (c == null) continue;
+
+						if ((c.kind == ConditionKind.FlagSet || c.kind == ConditionKind.FlagAbsent)
+							&& c.flag == flag)
+							return true;
+					}
 				}
+
+				if (e.choices == null) continue;
+
+				foreach (Choice ch in e.choices)
+				{
+					if (ch?.requirements == null) continue;
+
+					foreach (StateCondition c in ch.requirements)
+					{
+						if (c == null) continue;
+
+						if ((c.kind == ConditionKind.FlagSet || c.kind == ConditionKind.FlagAbsent)
+							&& c.flag == flag)
+							return true;
+					}
+				}
+			}
+		}
+
+		if (endings != null)
+		{
+			foreach (EndingDef e in endings)
+			{
+				if (e == null) continue;
+
+				if (e.requiredFlags != null && e.requiredFlags.Contains(flag)) return true;
+				if (e.forbiddenFlags != null && e.forbiddenFlags.Contains(flag)) return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static void CheckConditions(StateCondition[] conditions, string where,
+									HashSet<string> setFlags, List<string> warnings)
+	{
+		if (conditions == null) return;
+
+		foreach (StateCondition c in conditions)
+		{
+			if (c == null) continue;
+
+			if (c.kind == ConditionKind.FlagSet
+				&& !string.IsNullOrWhiteSpace(c.flag)
+				&& !setFlags.Contains(c.flag))
+			{
+				warnings.Add($"{where}: условие FlagSet '{c.flag}' нигде не выставляется — " +
+							 "условие никогда не выполнится.");
+			}
+
+			if (c.kind == ConditionKind.FlagAbsent
+				&& !string.IsNullOrWhiteSpace(c.flag)
+				&& !setFlags.Contains(c.flag))
+			{
+				warnings.Add($"{where}: условие FlagAbsent '{c.flag}' нигде не выставляется — " +
+							 "условие всегда истинно.");
 			}
 		}
 	}
