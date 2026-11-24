@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -20,6 +21,11 @@ public class EpilogueView : MonoBehaviour
 	[SerializeField] GameObject sealingPanel;
 	[SerializeField] TMP_Text sealingText;
 	[SerializeField] Button sealingButton;
+
+	[Header("Juice")]
+	[SerializeField] float sealCharsPerSecond = 34f;
+	[SerializeField] float sealButtonDelay = 0.25f;
+	[SerializeField] float revealFade = 0.22f;
 
 	EndingDef _ending;
 	RunState _state;
@@ -47,8 +53,18 @@ public class EpilogueView : MonoBehaviour
 
 	void Hide(RunState _)
 	{
+		StopAllCoroutines();
+
 		panel.SetActive(false);
 		if (sealingPanel != null) sealingPanel.SetActive(false);
+
+		if (sealingButton != null) sealingButton.gameObject.SetActive(true);
+		if (restartButton != null) restartButton.gameObject.SetActive(true);
+
+		CanvasGroup group = panel.GetComponent<CanvasGroup>();
+		if (group != null) group.alpha = 1f;
+
+		if (sealingText != null) sealingText.maxVisibleCharacters = 99999;
 
 		_ending = null;
 		_state = null;
@@ -56,6 +72,8 @@ public class EpilogueView : MonoBehaviour
 
 	void Show(EndingDef ending, RunState state)
 	{
+		StopAllCoroutines();
+
 		_ending = ending;
 		_state = state;
 
@@ -68,17 +86,61 @@ public class EpilogueView : MonoBehaviour
 
 			panel.SetActive(false);
 			sealingPanel.SetActive(true);
+
+			StartCoroutine(SealRoutine());
 		}
 		else
 		{
 			panel.SetActive(true);
+			StartCoroutine(RevealRoutine());
 		}
+	}
+
+	IEnumerator SealRoutine()
+	{
+		if (sealingButton != null) sealingButton.gameObject.SetActive(false);
+		if (sealingText != null) sealingText.maxVisibleCharacters = 0;
+
+		yield return Typewriter.Play(sealingText, sealCharsPerSecond);
+		yield return new WaitForSecondsRealtime(sealButtonDelay);
+
+		if (sealingButton != null) sealingButton.gameObject.SetActive(true);
 	}
 
 	void RevealEnding()
 	{
+		StopAllCoroutines();
+
 		if (sealingPanel != null) sealingPanel.SetActive(false);
+
 		panel.SetActive(true);
+		StartCoroutine(RevealRoutine());
+	}
+
+	IEnumerator RevealRoutine()
+	{
+		CanvasGroup group = panel.GetComponent<CanvasGroup>();
+		if (group == null) group = panel.AddComponent<CanvasGroup>();
+
+		if (restartButton != null) restartButton.gameObject.SetActive(false);
+
+		group.alpha = 0f;
+		float t = 0f;
+
+		while (t < revealFade)
+		{
+			t += Time.unscaledDeltaTime;
+			group.alpha = Mathf.Clamp01(t / revealFade);
+			yield return null;
+		}
+
+		group.alpha = 1f;
+
+		if (restartButton != null)
+		{
+			yield return new WaitForSecondsRealtime(0.35f);
+			restartButton.gameObject.SetActive(true);
+		}
 	}
 
 	void RenderEnding()

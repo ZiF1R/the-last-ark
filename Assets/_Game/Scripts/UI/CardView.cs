@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class CardView : MonoBehaviour
@@ -23,10 +25,34 @@ public class CardView : MonoBehaviour
 	[SerializeField] Color tagColor = new Color(0.35f, 0.37f, 0.36f);
 	[SerializeField] Color tagResonanceColor = new Color(0.72f, 0.52f, 0.16f);
 
+	[Header("Juice")]
+	[SerializeField] float hoverScale = 1.04f;
+	[SerializeField] float hoverDuration = 0.09f;
+	[SerializeField] float pickScale = 0.86f;
+	[SerializeField] float enterScale = 0.92f;
+	[SerializeField] float enterDuration = 0.16f;
+	public CardDef Def { get; private set; }
+
 	Action<CardDef> _onClick;
+	RectTransform _rect;
+	CanvasGroup _group;
+	Vector3 _baseScale = Vector3.one;
+	Coroutine _anim;
+	bool _interactable = true;
+
+	void Awake()
+	{
+		_rect = (RectTransform)transform;
+		_baseScale = _rect.localScale;
+
+		_group = GetComponent<CanvasGroup>();
+		if (_group == null)
+			_group = gameObject.AddComponent<CanvasGroup>();
+	}
 
 	public void Setup(CardDef card, Action<CardDef> onClick, RunState state = null)
 	{
+		Def = card;
 		_onClick = onClick;
 
 		nameText.text = card.displayName;
@@ -53,6 +79,115 @@ public class CardView : MonoBehaviour
 
 		button.onClick.RemoveAllListeners();
 		button.onClick.AddListener(() => _onClick?.Invoke(card));
+
+		StopAnim();
+		_interactable = true;
+		_group.alpha = 1f;
+		_group.blocksRaycasts = true;
+		_rect.localScale = _baseScale;
+	}
+	public void OnPointerEnter(PointerEventData eventData)
+	{
+		if (!_interactable) return;
+		AnimateTo(hoverScale, hoverDuration);
+	}
+
+	public void OnPointerExit(PointerEventData eventData)
+	{
+		if (!_interactable) return;
+		AnimateTo(1f, hoverDuration);
+	}
+
+	public IEnumerator PlayEnter(float delay)
+	{
+		_group.alpha = 0f;
+		_group.blocksRaycasts = false;
+		_rect.localScale = _baseScale * enterScale;
+
+		if (delay > 0f)
+			yield return new WaitForSecondsRealtime(delay);
+
+		float t = 0f;
+
+		while (t < enterDuration && this != null)
+		{
+			t += Time.unscaledDeltaTime;
+			float k = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t / enterDuration));
+
+			_group.alpha = k;
+			_rect.localScale = Vector3.Lerp(_baseScale * enterScale, _baseScale, k);
+
+			yield return null;
+		}
+
+		if (this == null) yield break;
+
+		_group.alpha = 1f;
+		_group.blocksRaycasts = true;
+		_rect.localScale = _baseScale;
+	}
+
+	public IEnumerator PlayPick(float duration)
+	{
+		StopAnim();
+
+		_interactable = false;
+		_group.blocksRaycasts = false;
+
+		Vector3 from = _rect.localScale;
+		Vector3 to = _baseScale * pickScale;
+		float t = 0f;
+
+		while (t < duration && this != null)
+		{
+			t += Time.unscaledDeltaTime;
+			float k = Mathf.Clamp01(t / duration);
+
+			_rect.localScale = Vector3.Lerp(from, to, k);
+			_group.alpha = 1f - k;
+
+			yield return null;
+		}
+
+		if (this == null) yield break;
+
+		_group.alpha = 0f;
+		_group.blocksRaycasts = false;
+	}
+
+	void AnimateTo(float multiplier, float duration)
+	{
+		if (this == null || !gameObject.activeInHierarchy) return;
+
+		if (_anim != null)
+			StopCoroutine(_anim);
+
+		_anim = StartCoroutine(AnimateRoutine(multiplier, duration));
+	}
+
+	IEnumerator AnimateRoutine(float multiplier, float duration)
+	{
+		Vector3 from = _rect.localScale;
+		Vector3 to = _baseScale * multiplier;
+		float t = 0f;
+
+		while (t < duration)
+		{
+			t += Time.unscaledDeltaTime;
+			_rect.localScale = Vector3.Lerp(from, to, Mathf.Clamp01(t / duration));
+			yield return null;
+		}
+
+		_rect.localScale = to;
+		_anim = null;
+	}
+
+	void StopAnim()
+	{
+		if (_anim == null) return;
+
+		StopCoroutine(_anim);
+		_anim = null;
 	}
 
 	string BuildTags(CardDef card, RunState state)

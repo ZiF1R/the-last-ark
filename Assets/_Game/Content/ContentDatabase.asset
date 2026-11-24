@@ -330,3 +330,14 @@ MonoBehaviour:
     forbiddenFlags: []
     requiredTags: 
     forbiddenTags: 
+  synergies:
+  - id: engineer_scientist
+    tagA: 0
+    tagB: 2
+    countB: 1
+    survival: 1
+    science: 1
+    morale: 0
+    setFlag: 
+    text: The lights hold. The lab hums. For a moment the ark feels like a ship,
+      not a lifeboat.

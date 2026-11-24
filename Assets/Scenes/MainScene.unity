@@ -1678,6 +1678,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameFlow
   db: {fileID: 11400000, guid: e2136db9489780c44a1f482872462a48, type: 2}
+  fader: {fileID: 891891545}
+  faderDuration: 0.6
+  pickSettle: 0.25
+  synergySettle: 0.35
+  turnSettle: 0.2
+  eventSettle: 0.15
+  epilogueSettle: 0.3
 --- !u!1 &428459379
 GameObject:
   m_ObjectHideFlags: 0
@@ -2332,6 +2339,9 @@ MonoBehaviour:
   sealingPanel: {fileID: 573708187}
   sealingText: {fileID: 1499712058}
   sealingButton: {fileID: 1291738198}
+  sealCharsPerSecond: 34
+  sealButtonDelay: 0.25
+  revealFade: 0.22
 --- !u!1 &479281126
 GameObject:
   m_ObjectHideFlags: 0
@@ -2433,6 +2443,7 @@ RectTransform:
   - {fileID: 1919680553}
   - {fileID: 111273596}
   - {fileID: 2146932033}
+  - {fileID: 1797440296}
   - {fileID: 364131473}
   - {fileID: 573708188}
   - {fileID: 891891544}
@@ -2744,6 +2755,8 @@ MonoBehaviour:
   emptyColor: {r: 0.12793697, g: 0.18958291, b: 0.21698111, a: 0.6039216}
   filledColor: {r: 0.3037113, g: 0.5309977, b: 0.6132076, a: 1}
   blockedColor: {r: 0.42, g: 0.16, b: 0.16, a: 1}
+  punchScale: 1.35
+  punchDuration: 0.28
 --- !u!1 &573708187
 GameObject:
   m_ObjectHideFlags: 0
@@ -2911,6 +2924,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EventPopupView
   flow: {fileID: 421980583}
   panel: {fileID: 111273595}
+  dialog: {fileID: 1937779011}
   titleText: {fileID: 65402922}
   causeText: {fileID: 1358941897}
   bodyText: {fileID: 988651345}
@@ -2927,6 +2941,9 @@ MonoBehaviour:
   labelNormal: {r: 0.91, g: 0.88, b: 0.83, a: 1}
   labelLocked: {r: 0.45, g: 0.5, b: 0.52, a: 1}
   hintColor: {r: 0.55, g: 0.62, b: 0.64, a: 1}
+  appearDuration: 0.14
+  resultCharsPerSecond: 90
+  maxResultDuration: 1.2
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -5823,6 +5840,8 @@ MonoBehaviour:
   panel: {fileID: 1965562301}
   cardRow: {fileID: 117742769}
   cardPrefab: {fileID: 7264649201279092523, guid: ed456af4ab5a86d45ab62d2cee901a6f, type: 3}
+  entranceStagger: 0.055
+  pickDuration: 0.14
 --- !u!1 &1415902164
 GameObject:
   m_ObjectHideFlags: 0
@@ -7191,6 +7210,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1770151037}
   m_CullTransparentMesh: 1
+--- !u!1 &1797440295
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1797440296}
+  - component: {fileID: 1797440297}
+  m_Layer: 5
+  m_Name: DeltaLayer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1797440296
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1797440295}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 490538511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &1797440297
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1797440295}
+  m_CullTransparentMesh: 1
 --- !u!1 &1859608385
 GameObject:
   m_ObjectHideFlags: 0
@@ -8044,6 +8107,15 @@ MonoBehaviour:
   moraleText: {fileID: 935088359}
   turnText: {fileID: 1578636075}
   pendingText: {fileID: 442615649}
+  deltaLayer: {fileID: 1797440296}
+  showFloaters: 1
+  floaterRise: 48
+  floaterDuration: 0.75
+  gainColor: {r: 0.45, g: 0.82, b: 0.46, a: 1}
+  lossColor: {r: 0.9, g: 0.38, b: 0.33, a: 1}
+  dangerThreshold: 2
+  dangerColor: {r: 0.86, g: 0.34, b: 0.29, a: 1}
+  pulseSpeed: 2.4
 --- !u!1 &2146932032
 GameObject:
   m_ObjectHideFlags: 0

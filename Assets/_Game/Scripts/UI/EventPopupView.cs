@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,6 +8,7 @@ public class EventPopupView : MonoBehaviour
 	[Header("Refs")]
 	[SerializeField] GameFlow flow;
 	[SerializeField] GameObject panel;
+	[SerializeField] RectTransform dialog;
 
 	[Header("Text")]
 	[SerializeField] TMP_Text titleText;
@@ -28,6 +30,14 @@ public class EventPopupView : MonoBehaviour
 	[SerializeField] Color labelLocked = new Color(0.45f, 0.50f, 0.52f);
 	[SerializeField] Color hintColor = new Color(0.55f, 0.62f, 0.64f);
 
+	[Header("Juice")]
+	[SerializeField] float appearDuration = 0.14f;
+	[SerializeField] float resultCharsPerSecond = 90f;
+	[SerializeField] float maxResultDuration = 1.2f;
+
+	CanvasGroup _dialogGroup;
+	Coroutine _appear;
+	Coroutine _typing;
 
 	EventDef _event;
 
@@ -40,6 +50,16 @@ public class EventPopupView : MonoBehaviour
 		}
 
 		continueButton.onClick.AddListener(OnContinueClicked);
+
+		if (dialog == null && panel != null && panel.transform.childCount > 0)
+			dialog = panel.transform.GetChild(0) as RectTransform;
+
+		if (dialog != null)
+		{
+			_dialogGroup = dialog.GetComponent<CanvasGroup>();
+			if (_dialogGroup == null)
+				_dialogGroup = dialog.gameObject.AddComponent<CanvasGroup>();
+		}
 	}
 
 	void OnEnable()
@@ -59,7 +79,15 @@ public class EventPopupView : MonoBehaviour
 	void Show(EventDef e, RunState state)
 	{
 		if (e == null) return;
+
 		_event = e;
+
+		StopAllCoroutines();
+		_typing = null;
+		_appear = null;
+		bodyText.maxVisibleCharacters = 99999;
+		resultText.maxVisibleCharacters = 99999;
+		continueButton.interactable = true;
 
 		titleText.text = e.title;
 		causeText.text = e.causeLine;
@@ -108,6 +136,32 @@ public class EventPopupView : MonoBehaviour
 		resultBlock.SetActive(false);
 		choiceBlock.SetActive(true);
 		panel.SetActive(true);
+		_appear = StartCoroutine(AppearRoutine());
+	}
+
+	IEnumerator AppearRoutine()
+	{
+		if (dialog == null || _dialogGroup == null) yield break;
+
+		_dialogGroup.alpha = 0f;
+		dialog.localScale = Vector3.one * 0.96f;
+
+		float t = 0f;
+
+		while (t < appearDuration)
+		{
+			t += Time.unscaledDeltaTime;
+			float k = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t / appearDuration));
+
+			_dialogGroup.alpha = k;
+			dialog.localScale = Vector3.Lerp(Vector3.one * 0.96f, Vector3.one, k);
+
+			yield return null;
+		}
+
+		_dialogGroup.alpha = 1f;
+		dialog.localScale = Vector3.one;
+		_appear = null;
 	}
 
 	void OnChoiceClicked(int index)
@@ -126,7 +180,6 @@ public class EventPopupView : MonoBehaviour
 		choiceBlock.SetActive(false);
 
 		string text = choice.result;
-
 		if (lost != null)
 		{
 			string lostLine = $"LOST: {lost.displayName}";
@@ -135,18 +188,49 @@ public class EventPopupView : MonoBehaviour
 				: $"{text}\n\n<size=85%><color=#B4544E>{lostLine}</color></size>";
 		}
 
+		if (_typing != null)
+		{
+			StopCoroutine(_typing);
+			_typing = null;
+		}
+
 		bool hasResult = !string.IsNullOrEmpty(text);
 		resultText.text = text;
 		resultText.gameObject.SetActive(hasResult);
-
 		bodyText.gameObject.SetActive(!hasResult);
 
 		resultBlock.SetActive(true);
+
+		if (hasResult)
+		{
+			resultText.maxVisibleCharacters = 0;
+			_typing = StartCoroutine(TypeResult());
+		}
+		else
+		{
+			continueButton.interactable = true;
+		}
+	}
+
+	IEnumerator TypeResult()
+	{
+		continueButton.interactable = false;
+
+		yield return Typewriter.Play(resultText, resultCharsPerSecond, maxResultDuration);
+
+		continueButton.interactable = true;
+		_typing = null;
 	}
 
 	void OnContinueClicked()
 	{
 		_event = null;
+
+		StopAllCoroutines();
+		_typing = null;
+		_appear = null;
+		resultText.maxVisibleCharacters = 99999;
+
 		panel.SetActive(false);
 		flow.ContinueAfterEvent();
 	}
@@ -154,6 +238,13 @@ public class EventPopupView : MonoBehaviour
 	void Hide(RunState _)
 	{
 		_event = null;
+
+		StopAllCoroutines();
+		_typing = null;
+		_appear = null;
+		resultText.maxVisibleCharacters = 99999;
+		_dialogGroup.alpha = 1f;
+
 		panel.SetActive(false);
 	}
 
