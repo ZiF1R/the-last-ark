@@ -45,7 +45,7 @@ public class DraftView : MonoBehaviour
 		for (int i = 0; i < offer.Count; i++)
 		{
 			CardView view = Instantiate(cardPrefab, cardRow);
-			view.Setup(offer[i], OnCardClicked);
+			view.Setup(offer[i], OnCardClicked, flow.State);
 			StartCoroutine(view.PlayEnter(i * entranceStagger));
 		}
 	}

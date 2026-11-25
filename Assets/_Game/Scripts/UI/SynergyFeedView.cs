@@ -138,10 +138,9 @@ public class SynergyFeedView : MonoBehaviour
 	{
 		var sb = new StringBuilder();
 
-		string accent = ColorUtility.ToHtmlStringRGB(rule.IsNegative ? bad : neutral);
+		string accent = UITheme.Html(rule.IsNegative ? UITheme.Danger : UITheme.Muted);
 
-		sb.Append($"<size=62%><color=#{accent}>SYNERGY</color></size>\n");
-		sb.Append("<size=115%><b>");
+		sb.Append($"<size={UITheme.FsMicro}><color=#{accent}>SYNERGY</color></size>\n");
 		sb.Append(TagLabel(rule.tagA));
 
 		if (rule.tagB != rule.tagA)
@@ -156,15 +155,7 @@ public class SynergyFeedView : MonoBehaviour
 			sb.Append($" × {Mathf.Max(2, rule.countB)}");
 		}
 
-		sb.Append("</b></size>");
-
-		//if (!string.IsNullOrWhiteSpace(rule.text))
-		//{
-		//	string f = ColorUtility.ToHtmlStringRGB(flavor);
-		//	sb.Append($"\n<size=85%><color=#{f}>{rule.text}</color></size>");
-		//}
-
-		sb.Append($"\n<size=90%>{BuildDelta(delta)}</size>");
+		sb.Append($"\n<size={UITheme.FsBody}>{BuildDelta(delta)}</size>");
 
 		return sb.ToString();
 	}
@@ -175,20 +166,20 @@ public class SynergyFeedView : MonoBehaviour
 
 		var parts = new List<string>();
 
-		AddChip(parts, d.survival, "SURVIVAL", "#6FA85C");
-		AddChip(parts, d.science, "SCIENCE", "#4FA3A5");
-		AddChip(parts, d.morale, "MORALE", "#E8A33D");
+		AddChip(parts, d.survival, "SURVIVAL", UITheme.Surv);
+		AddChip(parts, d.science, "SCIENCE", UITheme.Sci);
+		AddChip(parts, d.morale, "MORALE", UITheme.Mor);
 
 		if (parts.Count == 0)
-			return "<color=#8A8F8C>no stat change</color>";
+			return $"<color=#{UITheme.Html(UITheme.Muted)}>no stat change</color>";
 
 		return string.Join("   ", parts);
 	}
 
-	static void AddChip(List<string> parts, int v, string label, string hex)
+	static void AddChip(List<string> parts, int v, string label, Color color)
 	{
 		if (v == 0) return;
-		parts.Add($"<color={hex}>{(v > 0 ? "+" : "")}{v} {label}</color>");
+		parts.Add($"<color=#{UITheme.Html(color)}>{(v > 0 ? "+" : "")}{v} {label}</color>");
 	}
 
 	static string TagLabel(CardTag tag) => tag.ToString().ToUpperInvariant();

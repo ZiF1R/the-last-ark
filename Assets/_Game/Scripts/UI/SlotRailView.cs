@@ -1,25 +1,28 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SlotRailView : MonoBehaviour
 {
 	[SerializeField] Image[] slots;
-	[SerializeField] Color emptyColor = new Color(0.13f, 0.20f, 0.23f);
-	[SerializeField] Color filledColor = new Color(0.24f, 0.35f, 0.39f);
-	[SerializeField] Color blockedColor = new Color(0.42f, 0.16f, 0.16f);
+	[SerializeField] TMP_Text[] slotLabels;
+
+	[Header("Colors")]
+	[SerializeField] Color emptyColor = new Color(0.07f, 0.13f, 0.16f);
+	[SerializeField] Color sealedColor = new Color(0.42f, 0.16f, 0.16f);
+	[SerializeField] float roleTint = 0.35f;
 
 	[Header("Juice")]
-	[SerializeField] float punchScale = 1.35f;
-	[SerializeField] float punchDuration = 0.28f;
+	[SerializeField] float flashDuration = 0.28f;
 
-	Coroutine[] _punch;
+	Coroutine[] _flash;
 	bool[] _filled;
-	private bool[] _nowFilled;
+	bool[] _nowFilled;
 
 	void Awake()
 	{
-		_punch = new Coroutine[slots.Length];
+		_flash = new Coroutine[slots.Length];
 		_filled = new bool[slots.Length];
 		_nowFilled = new bool[slots.Length];
 	}
@@ -40,15 +43,18 @@ public class SlotRailView : MonoBehaviour
 	{
 		for (int i = 0; i < slots.Length; i++)
 		{
-			if (_punch[i] != null)
+			if (_flash[i] != null)
 			{
-				StopCoroutine(_punch[i]);
-				_punch[i] = null;
+				StopCoroutine(_flash[i]);
+				_flash[i] = null;
 			}
 
-			slots[i].transform.localScale = Vector3.one;
+			slots[i].color = emptyColor;
 			_filled[i] = false;
 			_nowFilled[i] = false;
+
+			if (slotLabels != null && i < slotLabels.Length && slotLabels[i] != null)
+				slotLabels[i].text = "";
 		}
 	}
 
@@ -56,8 +62,8 @@ public class SlotRailView : MonoBehaviour
 	{
 		for (int i = 0; i < slots.Length; i++)
 		{
-			slots[i].color = emptyColor;
 			_nowFilled[i] = false;
+			SetSlot(i, emptyColor, UITheme.Muted, "");
 		}
 
 		int slotIndex = 0;
@@ -66,6 +72,10 @@ public class SlotRailView : MonoBehaviour
 		{
 			if (card == null) continue;
 
+			Color tint = Color.Lerp(emptyColor, UITheme.RoleColor(card.role), roleTint);
+			Color labelColor = Color.Lerp(UITheme.RoleColor(card.role), UITheme.Bone, 0.45f);
+			string name = card.displayName.ToUpperInvariant();
+
 			for (int k = 0; k < card.slotCost && slotIndex < slots.Length; k++)
 			{
 				while (slotIndex < slots.Length && state.sealedSlots.Contains(slotIndex))
@@ -73,44 +83,55 @@ public class SlotRailView : MonoBehaviour
 
 				if (slotIndex >= slots.Length) break;
 
-				slots[slotIndex].color = filledColor;
+				SetSlot(slotIndex, tint, labelColor, k == 0 ? name : "");
 				_nowFilled[slotIndex] = true;
 				slotIndex++;
 			}
 		}
 
 		foreach (int i in state.sealedSlots)
+		{
 			if (i >= 0 && i < slots.Length)
-				slots[i].color = blockedColor;
+				SetSlot(i, sealedColor, UITheme.Danger, "SEALED");
+		}
 
 		for (int i = 0; i < slots.Length; i++)
 		{
 			if (_nowFilled[i] && !_filled[i])
 			{
-				if (_punch[i] != null) StopCoroutine(_punch[i]);
-
-				_punch[i] = StartCoroutine(PunchRoutine(i));
+				if (_flash[i] != null) StopCoroutine(_flash[i]);
+				_flash[i] = StartCoroutine(FlashRoutine(i, slots[i].color));
 			}
 
 			_filled[i] = _nowFilled[i];
 		}
 	}
 
-	IEnumerator PunchRoutine(int i)
+	void SetSlot(int index, Color frame, Color labelColor, string text)
 	{
-		Transform tr = slots[i].transform;
-		Vector3 baseScale = tr.localScale;
+		slots[index].color = frame;
+
+		if (slotLabels == null || index >= slotLabels.Length || slotLabels[index] == null) return;
+
+		slotLabels[index].text = text;
+		slotLabels[index].color = labelColor;
+	}
+
+	IEnumerator FlashRoutine(int index, Color target)
+	{
+		Color from = Color.Lerp(target, UITheme.Bone, 0.55f);
 		float t = 0f;
 
-		while (t < punchDuration)
+		slots[index].color = from;
+
+		while (t < flashDuration)
 		{
 			t += Time.unscaledDeltaTime;
-			float k = Mathf.Clamp01(t / punchDuration);
-			tr.localScale = baseScale * (1f + (punchScale - 1f) * Mathf.Sin(k * Mathf.PI));
+			slots[index].color = Color.Lerp(from, target, Mathf.Clamp01(t / flashDuration));
 			yield return null;
 		}
 
-		tr.localScale = baseScale;
-		_punch[i] = null;
+		slots[index].color = target;
+		_flash[index] = null;
 	}
 }

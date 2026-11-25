@@ -12,6 +12,7 @@ public class CardView : MonoBehaviour
 	[Header("Refs")]
 	[SerializeField] Image frame;
 	[SerializeField] Image icon;
+	[SerializeField] Image topBand;
 	[SerializeField] TMP_Text nameText;
 	[SerializeField] TMP_Text roleText;
 	[SerializeField] TMP_Text quoteText;
@@ -21,12 +22,16 @@ public class CardView : MonoBehaviour
 	[SerializeField] TMP_Text costText;
 	[SerializeField] Button button;
 
-	[Header("Tag Colors")]
-	[SerializeField] Color tagColor = new Color(0.35f, 0.37f, 0.36f);
-	[SerializeField] Color tagResonanceColor = new Color(0.72f, 0.52f, 0.16f);
+	[Header("Art")]
+	// Swapped on hover: a non-integer scale would resample the 9-slice panel and
+	// the pixel art would shimmer, so the frame changes sprite instead.
+	[SerializeField] Sprite hoverFrame;
+	[SerializeField] Sprite[] roleIcons;
 
 	[Header("Juice")]
-	[SerializeField] float hoverScale = 1.04f;
+	// Hover never scales the card: a non-integer scale resamples the 9-slice and the
+	// pixel art starts to shimmer. We lift the icon and brighten the frame instead.
+	[SerializeField] float hoverLift = 6f;
 	[SerializeField] float hoverDuration = 0.09f;
 	[SerializeField] float pickScale = 0.86f;
 	[SerializeField] float enterScale = 0.92f;
@@ -37,6 +42,9 @@ public class CardView : MonoBehaviour
 	RectTransform _rect;
 	CanvasGroup _group;
 	Vector3 _baseScale = Vector3.one;
+	Vector2 _iconBasePos;
+	Color _frameBase = Color.white;
+	Sprite _frameSprite;
 	Coroutine _anim;
 	bool _interactable = true;
 
@@ -44,6 +52,13 @@ public class CardView : MonoBehaviour
 	{
 		_rect = (RectTransform)transform;
 		_baseScale = _rect.localScale;
+
+		if (icon != null) _iconBasePos = icon.rectTransform.anchoredPosition;
+		if (frame != null)
+		{
+			_frameBase = frame.color;
+			_frameSprite = frame.sprite;
+		}
 
 		_group = GetComponent<CanvasGroup>();
 		if (_group == null)
@@ -56,9 +71,9 @@ public class CardView : MonoBehaviour
 		_onClick = onClick;
 
 		nameText.text = card.displayName;
-		roleText.text = card.role.ToString().ToUpperInvariant();
+		roleText.text = UITheme.RoleLabel(card.role);
 		quoteText.text = card.quote;
-		effectsText.text = BuildEffects(card);
+		effectsText.text = BuildEffects(card, state);
 
 		if (tagsText != null)
 		{
@@ -67,11 +82,30 @@ public class CardView : MonoBehaviour
 			tagsText.gameObject.SetActive(!string.IsNullOrEmpty(tags));
 		}
 
-		bool hasIcon = card.icon != null;
-		icon.enabled = true;
-		icon.sprite = card.icon;
-		icon.color = hasIcon ? Color.white : RoleColor(card.role);
+		// Never overwrite the prefab sprite with a null reference: the role sigil lives
+		// in the prefab and is only replaced when the card actually ships artwork.
+		Sprite roleIcon = RoleIcon(card.role);
+
+		if (card.icon != null)
+		{
+			icon.sprite = card.icon;
+			icon.color = Color.white;
+		}
+		else if (roleIcon != null)
+		{
+			icon.sprite = roleIcon;
+			icon.color = Color.white;
+		}
+		else
+		{
+			icon.color = UITheme.RoleColor(card.role);
+		}
+
+		icon.enabled = icon.sprite != null;
 		icon.preserveAspect = true;
+
+		if (topBand != null)
+			topBand.color = UITheme.RoleColor(card.role);
 
 		bool costsTwo = card.slotCost > 1;
 		costBadge.SetActive(costsTwo);
@@ -85,17 +119,30 @@ public class CardView : MonoBehaviour
 		_group.alpha = 1f;
 		_group.blocksRaycasts = true;
 		_rect.localScale = _baseScale;
+
+		if (icon != null) icon.rectTransform.anchoredPosition = _iconBasePos;
+		if (frame != null)
+		{
+			frame.color = _frameBase;
+			frame.sprite = _frameSprite;
+		}
+	}
+
+	Sprite RoleIcon(CardRole role)
+	{
+		if (roleIcons == null || roleIcons.Length == 0) return null;
+		return roleIcons[(int)role % roleIcons.Length];
 	}
 	public void OnPointerEnter(PointerEventData eventData)
 	{
 		if (!_interactable) return;
-		AnimateTo(hoverScale, hoverDuration);
+		AnimateHover(true);
 	}
 
 	public void OnPointerExit(PointerEventData eventData)
 	{
 		if (!_interactable) return;
-		AnimateTo(1f, hoverDuration);
+		AnimateHover(false);
 	}
 
 	public IEnumerator PlayEnter(float delay)
@@ -155,30 +202,43 @@ public class CardView : MonoBehaviour
 		_group.blocksRaycasts = false;
 	}
 
-	void AnimateTo(float multiplier, float duration)
+	void AnimateHover(bool on)
 	{
 		if (this == null || !gameObject.activeInHierarchy) return;
 
 		if (_anim != null)
 			StopCoroutine(_anim);
 
-		_anim = StartCoroutine(AnimateRoutine(multiplier, duration));
+		_anim = StartCoroutine(HoverRoutine(on));
 	}
 
-	IEnumerator AnimateRoutine(float multiplier, float duration)
+	IEnumerator HoverRoutine(bool on)
 	{
-		Vector3 from = _rect.localScale;
-		Vector3 to = _baseScale * multiplier;
+		Vector2 fromPos = icon != null ? icon.rectTransform.anchoredPosition : Vector2.zero;
+		Vector2 toPos = icon != null ? _iconBasePos + (on ? Vector2.up * hoverLift : Vector2.zero) : Vector2.zero;
+
+		Color fromColor = frame != null ? frame.color : Color.white;
+		Color toColor = on ? Color.Lerp(_frameBase, UITheme.Bone, 0.45f) : _frameBase;
+
+		bool swap = frame != null && hoverFrame != null;
+		if (swap) frame.sprite = on ? hoverFrame : _frameSprite;
+
 		float t = 0f;
 
-		while (t < duration)
+		while (t < hoverDuration)
 		{
 			t += Time.unscaledDeltaTime;
-			_rect.localScale = Vector3.Lerp(from, to, Mathf.Clamp01(t / duration));
+			float k = Mathf.Clamp01(t / hoverDuration);
+
+			if (icon != null) icon.rectTransform.anchoredPosition = Vector2.Lerp(fromPos, toPos, k);
+			if (frame != null && !swap) frame.color = Color.Lerp(fromColor, toColor, k);
+
 			yield return null;
 		}
 
-		_rect.localScale = to;
+		if (icon != null) icon.rectTransform.anchoredPosition = toPos;
+		if (frame != null && !swap) frame.color = toColor;
+
 		_anim = null;
 	}
 
@@ -199,44 +259,55 @@ public class CardView : MonoBehaviour
 		foreach (CardTag tag in card.tags)
 		{
 			bool resonates = state != null && state.HasTag(tag);
-			Color color = resonates ? tagResonanceColor : tagColor;
+			Color color = resonates ? UITheme.Mor : UITheme.Muted;
 
-			parts.Add($"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{tag.ToString().ToUpperInvariant()}</color>");
+			parts.Add($"<color=#{UITheme.Html(color)}>{tag.ToString().ToUpperInvariant()}</color>");
 		}
 
 		return string.Join("  ·  ", parts);
 	}
 
-	static string BuildEffects(CardDef c)
+	static string BuildEffects(CardDef c, RunState state)
 	{
 		var lines = new List<string>();
 
-		AddLine(lines, c.survival, "SURVIVAL", "#6FA85C");
-		AddLine(lines, c.science, "SCIENCE", "#4FA3A5");
-		AddLine(lines, c.morale, "MORALE", "#E8A33D");
+		AddLine(lines, c.survival, "SURVIVAL", UITheme.Surv);
+		AddLine(lines, c.science, "SCIENCE", UITheme.Sci);
+		AddLine(lines, c.morale, "MORALE", UITheme.Mor);
 
 		string delayed = BuildDelayed(c.delayed);
 		if (!string.IsNullOrEmpty(delayed))
 			lines.Add(delayed);
 
-		string period = c.passivePeriod > 1 ? $"EVERY {c.passivePeriod} TURNS" : "EACH TURN";
-		AddPassive(lines, c.passiveSurvival, "SURVIVAL", "#6FA85C", period);
-		AddPassive(lines, c.passiveScience, "SCIENCE", "#4FA3A5", period);
-		AddPassive(lines, c.passiveMorale, "MORALE", "#E8A33D", period);
+		string period = c.passivePeriod > 1 ? $"/{c.passivePeriod} TURNS" : "/TURN";
+		AddPassive(lines, c.passiveSurvival, "SURVIVAL", UITheme.Surv, period);
+		AddPassive(lines, c.passiveScience, "SCIENCE", UITheme.Sci, period);
+		AddPassive(lines, c.passiveMorale, "MORALE", UITheme.Mor, period);
+
+		if (state != null && WouldKill(state, c))
+			lines.Add($"<color=#{UITheme.Html(UITheme.Danger)}>FATAL</color>");
 
 		return string.Join("\n", lines);
 	}
 
-	static void AddLine(List<string> lines, int v, string label, string hex)
+	/// <summary>True when taking this card right now drops a stat to zero.</summary>
+	public static bool WouldKill(RunState state, CardDef c)
 	{
-		if (v == 0) return;
-		lines.Add($"<color={hex}>{(v > 0 ? "+" : "")}{v} {label}</color>");
+		return Mathf.Clamp(state.survival + c.survival, 0, 10) <= 0
+			|| Mathf.Clamp(state.science + c.science, 0, 10) <= 0
+			|| Mathf.Clamp(state.morale + c.morale, 0, 10) <= 0;
 	}
 
-	static void AddPassive(List<string> lines, int v, string label, string hex, string period)
+	static void AddLine(List<string> lines, int v, string label, Color color)
 	{
 		if (v == 0) return;
-		lines.Add($"<size=100%><color={hex}>{(v > 0 ? "+" : "")}{v} {label} {period}</color></size>");
+		lines.Add($"<color=#{UITheme.Html(color)}>{label} {(v > 0 ? "+" : "")}{v}</color>");
+	}
+
+	static void AddPassive(List<string> lines, int v, string label, Color color, string period)
+	{
+		if (v == 0) return;
+		lines.Add($"<color=#{UITheme.Html(color)}>{label} {(v > 0 ? "+" : "")}{v} <size={UITheme.FsMicro}>{period}</size></color>");
 	}
 
 	static string BuildDelayed(DelayedEffect d)
@@ -244,33 +315,19 @@ public class CardView : MonoBehaviour
 		if (d == null || d.IsEmpty) return null;
 
 		var parts = new List<string>();
-		AddDelayedPart(parts, d.survival, "SURVIVAL", "#6FA85C");
-		AddDelayedPart(parts, d.science, "SCIENCE", "#4FA3A5");
-		AddDelayedPart(parts, d.morale, "MORALE", "#E8A33D");
+		AddDelayedPart(parts, d.survival, "SURVIVAL", UITheme.Surv);
+		AddDelayedPart(parts, d.science, "SCIENCE", UITheme.Sci);
+		AddDelayedPart(parts, d.morale, "MORALE", UITheme.Mor);
 
 		if (parts.Count == 0) return null;
 
 		string when = d.turns == 1 ? "NEXT TURN" : $"IN {d.turns} TURNS";
-		return $"<size=100%><color=#8A8F8C>{when}:</color> {string.Join(", ", parts)}</size>";
+		return $"<size={UITheme.FsMicro}><color=#{UITheme.Html(UITheme.Muted)}>{when}</color></size>\n{string.Join("\n", parts)}";
 	}
 
-	static void AddDelayedPart(List<string> parts, int v, string label, string hex)
+	static void AddDelayedPart(List<string> parts, int v, string label, Color color)
 	{
 		if (v == 0) return;
-		parts.Add($"<color={hex}>{(v > 0 ? "+" : "")}{v} {label}</color>");
+		parts.Add($"<color=#{UITheme.Html(color)}>{label} {(v > 0 ? "+" : "")}{v}</color>");
 	}
-
-	static readonly Color[] RoleColors =
-	{
-		new Color(0.42f, 0.66f, 0.36f), // Biolog
-        new Color(0.31f, 0.64f, 0.65f), // Engineer
-        new Color(0.72f, 0.36f, 0.30f), // Soldier
-        new Color(0.91f, 0.64f, 0.24f), // Medic
-        new Color(0.85f, 0.75f, 0.55f), // Child
-        new Color(0.45f, 0.45f, 0.50f), // Sick
-        new Color(0.55f, 0.60f, 0.35f), // Farmer
-        new Color(0.60f, 0.40f, 0.65f), // Mutant
-    };
-
-	static Color RoleColor(CardRole role) => RoleColors[(int)role % RoleColors.Length];
 }

@@ -13,7 +13,6 @@ public class ResourceBarView : MonoBehaviour
 
 	[Header("Floating Deltas")]
 	[SerializeField] RectTransform deltaLayer;
-	//[SerializeField] bool showFloaters = true;
 	[SerializeField] float floaterRise = 48f;
 	[SerializeField] float floaterDuration = 0.75f;
 	[SerializeField] Color gainColor = new Color(0.45f, 0.82f, 0.46f);
@@ -164,7 +163,6 @@ public class ResourceBarView : MonoBehaviour
 		floater.text = (value > 0 ? "+" : "") + value;
 		floater.color = value > 0 ? gainColor : lossColor;
 		floater.alignment = TextAlignmentOptions.Center;
-		floater.fontStyle = FontStyles.Bold;
 		floater.textWrappingMode = TextWrappingModes.NoWrap;
 
 		RectTransform rt = floater.rectTransform;

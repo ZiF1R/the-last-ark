@@ -13,15 +13,120 @@ MonoBehaviour:
   m_Name: ContentDatabase
   m_EditorClassIdentifier: Assembly-CSharp::ContentDatabase
   cards:
-  - id: alex_engineer
-    displayName: Alex
+  - id: ilya_engineer
+    displayName: Ilya
     role: 1
-    quote: He keeps the lights on. For now.
+    quote: The reactor answers to me. Mostly.
     tags: 0000000001000000
     slotCost: 1
     survival: 2
+    science: 1
+    morale: -2
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: -1
+      science: 0
+      morale: 0
+      turns: 2
+    eventOnPickId: 
+    <weight>k__BackingField: 10
+    icon: {fileID: 0}
+  - id: vera_engineer
+    displayName: Vera
+    role: 1
+    quote: I can get us to the belt. I cannot get us back.
+    tags: 0000000006000000
+    slotCost: 2
+    survival: 3
+    science: 3
+    morale: -1
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: -2
+      turns: 2
+    eventOnPickId: 
+    <weight>k__BackingField: 7
+    icon: {fileID: 0}
+  - id: oskar_engineer
+    displayName: Oskar
+    role: 1
+    quote: The vent is warm. It should not be warm.
+    tags: 0000000009000000
+    slotCost: 1
+    survival: 1
+    science: 2
+    morale: -2
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
+    eventOnPickId: oskar_reveal
+    <weight>k__BackingField: 8
+    icon: {fileID: 0}
+  - id: marek_soldier
+    displayName: Marek
+    role: 2
+    quote: Nobody has shot at us in six days. I count.
+    tags: 0400000001000000
+    slotCost: 1
+    survival: 2
+    science: -1
+    morale: 1
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: -1
+      turns: 1
+    eventOnPickId: 
+    <weight>k__BackingField: 10
+    icon: {fileID: 0}
+  - id: tamsin_soldier
+    displayName: Tamsin
+    role: 2
+    quote: Someone has to decide who eats first. It is me.
+    tags: 0400000006000000
+    slotCost: 2
+    survival: 3
+    science: -2
+    morale: 2
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
+    eventOnPickId: tamsin_orders
+    <weight>k__BackingField: 7
+    icon: {fileID: 0}
+  - id: bram_soldier
+    displayName: Bram
+    role: 2
+    quote: I will stand the watch. Just not near anyone.
+    tags: 0400000007000000
+    slotCost: 1
+    survival: 1
     science: 0
-    morale: 0
+    morale: -2
     passiveSurvival: 0
     passiveScience: 0
     passiveMorale: 0
@@ -32,59 +137,38 @@ MonoBehaviour:
       morale: 0
       turns: 2
     eventOnPickId: 
-    <weight>k__BackingField: 10
+    <weight>k__BackingField: 9
     icon: {fileID: 0}
-  - id: maria_biologist
-    displayName: Maria
-    role: 0
-    quote: Characteristic
-    tags: 0200000003000000
-    slotCost: 2
-    survival: 0
-    science: 2
-    morale: 0
-    passiveSurvival: 0
-    passiveScience: 0
-    passiveMorale: 0
-    passivePeriod: 1
-    delayed:
-      survival: 0
-      science: 0
-      morale: 0
-      turns: 1
-    eventOnPickId: 
-    <weight>k__BackingField: 10
-    icon: {fileID: 0}
-  - id: dan_soldier
-    displayName: Dan
-    role: 2
-    quote: Characteristic
-    tags: 04000000
-    slotCost: 1
-    survival: 2
-    science: 0
-    morale: -1
-    passiveSurvival: 0
-    passiveScience: 0
-    passiveMorale: 0
-    passivePeriod: 1
-    delayed:
-      survival: 0
-      science: 0
-      morale: 0
-      turns: 1
-    eventOnPickId: 
-    <weight>k__BackingField: 10
-    icon: {fileID: 0}
-  - id: kira_medic
-    displayName: Kira
+  - id: nadia_medic
+    displayName: Nadia
     role: 3
-    quote: Characteristic
-    tags: 05000000
+    quote: I can fix a bone. I cannot fix the air.
+    tags: 0500000002000000
     slotCost: 1
-    survival: 0
-    science: 0
-    morale: 1
+    survival: 1
+    science: 1
+    morale: 2
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
+    eventOnPickId: 
+    <weight>k__BackingField: 5
+    icon: {fileID: 0}
+  - id: pieter_medic
+    displayName: Pieter
+    role: 3
+    quote: I have a cough. It is not that kind of cough.
+    tags: 0500000007000000
+    slotCost: 1
+    survival: -1
+    science: 1
+    morale: 2
     passiveSurvival: 0
     passiveScience: 0
     passiveMorale: 1
@@ -97,32 +181,95 @@ MonoBehaviour:
     eventOnPickId: 
     <weight>k__BackingField: 10
     icon: {fileID: 0}
-  - id: sam_kid
-    displayName: Sam
-    role: 4
-    quote: Characteristic
-    tags: 0300000006000000
+  - id: rosa_medic
+    displayName: Rosa
+    role: 3
+    quote: Three hours of sleep. That is the whole budget.
+    tags: 0500000001000000
     slotCost: 2
-    survival: 0
+    survival: 2
+    science: 2
+    morale: 3
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: -1
+      turns: 2
+    eventOnPickId: 
+    <weight>k__BackingField: 8
+    icon: {fileID: 0}
+  - id: june_child
+    displayName: June
+    role: 4
+    quote: The stars are not where you said they would be.
+    tags: 0300000006000000
+    slotCost: 1
+    survival: -1
     science: 0
-    morale: 1
+    morale: 3
     passiveSurvival: 0
     passiveScience: 0
     passiveMorale: 1
-    passivePeriod: 1
+    passivePeriod: 2
     delayed:
       survival: 0
       science: 0
       morale: 0
       turns: 1
     eventOnPickId: 
-    <weight>k__BackingField: 10
+    <weight>k__BackingField: 9
     icon: {fileID: 0}
-  - id: mattew_sick
-    displayName: Mattew
+  - id: tobi_child
+    displayName: Tobi
+    role: 4
+    quote: I am not tired. I am just cold.
+    tags: 0300000007000000
+    slotCost: 1
+    survival: -2
+    science: 1
+    morale: 2
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: -1
+      science: 0
+      morale: 0
+      turns: 2
+    eventOnPickId: 
+    <weight>k__BackingField: 9
+    icon: {fileID: 0}
+  - id: essa_child
+    displayName: Essa
+    role: 4
+    quote: The vent sings back if you are quiet enough.
+    tags: 0300000009000000
+    slotCost: 1
+    survival: -1
+    science: 2
+    morale: 1
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
+    eventOnPickId: essa_sings
+    <weight>k__BackingField: 6
+    icon: {fileID: 0}
+  - id: halloran_sick
+    displayName: Halloran
     role: 5
-    quote: Characteristic
-    tags: 0700000002000000
+    quote: I will be fine by the next burn. Probably.
+    tags: 0700000001000000
     slotCost: 1
     survival: -2
     science: 1
@@ -132,23 +279,191 @@ MonoBehaviour:
     passiveMorale: 0
     passivePeriod: 1
     delayed:
+      survival: -2
+      science: 0
+      morale: 0
+      turns: 2
+    eventOnPickId: 
+    <weight>k__BackingField: 9
+    icon: {fileID: 0}
+  - id: mireille_sick
+    displayName: Mireille
+    role: 5
+    quote: I read the whole library twice. It is shorter now.
+    tags: 0700000006000000
+    slotCost: 1
+    survival: -1
+    science: 0
+    morale: 2
+    passiveSurvival: 0
+    passiveScience: 1
+    passiveMorale: -1
+    passivePeriod: 2
+    delayed:
       survival: 0
       science: 0
       morale: 0
       turns: 1
-    eventOnPickId: cough
+    eventOnPickId: 
     <weight>k__BackingField: 10
     icon: {fileID: 0}
-  - id: lize_farmer
-    displayName: Lize
+  - id: corwin_sick
+    displayName: Corwin
+    role: 5
+    quote: It is just the dust. Everyone has the dust.
+    tags: 0700000002000000
+    slotCost: 1
+    survival: -1
+    science: 2
+    morale: 1
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
+    eventOnPickId: corwin_cough
+    <weight>k__BackingField: 8
+    icon: {fileID: 0}
+  - id: ana_farmer
+    displayName: Ana
     role: 6
-    quote: Characteristic
-    tags: 08000000
+    quote: The soil is dead. I am planting anyway.
+    tags: 0800000001000000
+    slotCost: 1
+    survival: 2
+    science: -1
+    morale: 1
+    passiveSurvival: 1
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 2
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
+    eventOnPickId: 
+    <weight>k__BackingField: 10
+    icon: {fileID: 0}
+  - id: dmitri_farmer
+    displayName: Dmitri
+    role: 6
+    quote: Give me six weeks and I will give you a field.
+    tags: 0800000006000000
+    slotCost: 2
+    survival: 3
+    science: 0
+    morale: 2
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 1
+      science: 0
+      morale: 0
+      turns: 2
+    eventOnPickId: 
+    <weight>k__BackingField: 7
+    icon: {fileID: 0}
+  - id: salk_farmer
+    displayName: Salk
+    role: 6
+    quote: The seeds do not care what my hands look like.
+    tags: 0800000009000000
     slotCost: 1
     survival: 1
-    science: 0
+    science: 1
+    morale: -2
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
+    eventOnPickId: 
+    <weight>k__BackingField: 9
+    icon: {fileID: 0}
+  - id: yusuf_mutant
+    displayName: Yusuf
+    role: 7
+    quote: I can reach the panel. Nobody asks how.
+    tags: 0900000000000000
+    slotCost: 1
+    survival: 1
+    science: 2
+    morale: -2
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
+    eventOnPickId: yusuf_hands
+    <weight>k__BackingField: 7
+    icon: {fileID: 0}
+  - id: lena_mutant
+    displayName: Lena
+    role: 7
+    quote: The scanner hesitates. It should not hesitate.
+    tags: 0900000007000000
+    slotCost: 1
+    survival: -2
+    science: 2
+    morale: 1
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 1
+      morale: 0
+      turns: 1
+    eventOnPickId: 
+    <weight>k__BackingField: 9
+    icon: {fileID: 0}
+  - id: orin_mutant
+    displayName: Orin
+    role: 7
+    quote: I am not sick. I am just built differently.
+    tags: 0900000001000000
+    slotCost: 2
+    survival: 3
+    science: 2
     morale: -1
-    passiveSurvival: 1
+    passiveSurvival: 0
+    passiveScience: 1
+    passiveMorale: 0
+    passivePeriod: 2
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
+    eventOnPickId: 
+    <weight>k__BackingField: 6
+    icon: {fileID: 0}
+  - id: ilse_biolog
+    displayName: Ilse
+    role: 0
+    quote: There is a sample in the fridge. It is still moving.
+    tags: 02000000
+    slotCost: 1
+    survival: -1
+    science: 3
+    morale: -1
+    passiveSurvival: 0
     passiveScience: 0
     passiveMorale: 0
     passivePeriod: 1
@@ -160,30 +475,74 @@ MonoBehaviour:
     eventOnPickId: 
     <weight>k__BackingField: 10
     icon: {fileID: 0}
+  - id: kestrel_biolog
+    displayName: Kestrel
+    role: 0
+    quote: The lab is cold. The results are cold too.
+    tags: 0200000006000000
+    slotCost: 2
+    survival: 1
+    science: 3
+    morale: 1
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: -1
+      turns: 2
+    eventOnPickId: 
+    <weight>k__BackingField: 8
+    icon: {fileID: 0}
+  - id: osei_biolog
+    displayName: Osei
+    role: 0
+    quote: The cultures grow. I do not ask what they eat.
+    tags: 0200000007000000
+    slotCost: 1
+    survival: -1
+    science: 2
+    morale: -1
+    passiveSurvival: 0
+    passiveScience: 1
+    passiveMorale: 0
+    passivePeriod: 2
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
+    eventOnPickId: 
+    <weight>k__BackingField: 9
+    icon: {fileID: 0}
   events:
-  - id: cough
-    title: COUGH BEHIND WALL
-    body: Something happened.
-    causeLine: You are choosed sick person
+  - id: oskar_reveal
+    title: THE HAND IN THE VENT
+    body: He shows nobody. The vent shows everyone. The grate is bent outward in
+      a shape with five points and one extra. He does not explain. The log has a
+      field for this. Nobody fills it.
+    causeLine: The new engineer has six fingers.
     conditions:
     - kind: 0
-      tag: 7
-      role: 5
-      flag: sick
+      tag: 9
+      role: 0
+      flag: 
       stat: 0
       value: 0
-    minTurn: 1
-    maxTurn: 100
+    minTurn: 0
+    maxTurn: 99
     priority: 0
     <weight>k__BackingField: 10
     once: 1
     choices:
-    - label: ISOLATE
-      result: Isolate sick person
+    - label: KEEP HIM QUIET
+      result: The log stays blank. He stays. The vent stays warm.
       survival: 0
-      science: 0
-      morale: -2
-      setFlag: mattew_isolated
+      science: 1
+      morale: -1
+      setFlag: oskar_vented
       requirements: []
       lockHint: 
       removal:
@@ -191,56 +550,97 @@ MonoBehaviour:
         cardId: 
         tag: 0
         role: 0
-    - label: RECOVER
-      result: Recover sick person
-      survival: -1
+    - label: PUT HIM OUT
+      result: The airlock cycles. The shape in the grate is still there.
+      survival: 1
+      science: 0
+      morale: -2
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 1
+        cardId: oskar_engineer
+        tag: 0
+        role: 0
+  - id: tamsin_orders
+    title: ORDERS FROM THE BRIDGE
+    body: Three pages. Rationing, watch rotation, a line about the child. She has
+      signed them. She has not asked anyone. The pen is still in her hand when you
+      find her.
+    causeLine: The soldier has been writing orders.
+    conditions:
+    - kind: 1
+      tag: 0
+      role: 2
+      flag: 
+      stat: 0
+      value: 0
+    minTurn: 0
+    maxTurn: 99
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: SIGN THEM
+      result: The orders stand. The crew obeys. Nobody looks at her.
+      survival: 1
       science: 0
       morale: 1
-      setFlag: cured
-      requirements:
-      - kind: 0
-        tag: 5
-        role: 0
-        flag: 
-        stat: 0
-        value: 0
-      lockHint: NO... NEEDS MEDIC
+      setFlag: tamsin_oath
+      requirements: []
+      lockHint: 
       removal:
         selector: 0
         cardId: 
         tag: 0
         role: 0
-  - id: patient_dies
-    title: THE COUGH STOPS
-    body: For three days the coughing kept everyone awake. On the fourth, it stopped.
-    causeLine: Mattew was sick when you took him aboard.
+    - label: BURN THEM
+      result: The paper curls. She watches it. She does not argue.
+      survival: 0
+      science: 0
+      morale: -1
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: essa_sings
+    title: SOMETHING IN THE DUCT
+    body: The duct is not a person. The duct answers anyway. The sound is not a child's
+      sound. She says it is a friend. She says it has been there since the burn.
+    causeLine: The child has been singing to the vent.
     conditions:
     - kind: 0
-      tag: 7
-      role: 5
-      flag: sick
+      tag: 3
+      role: 0
+      flag: 
       stat: 0
       value: 0
-    - kind: 7
-      tag: 7
-      role: 5
-      flag: cured
-      stat: 0
-      value: 0
-    - kind: 2
-      tag: 7
-      role: 5
-      flag: mattew_isolated
-      stat: 0
-      value: 0
-    minTurn: 3
+    minTurn: 0
     maxTurn: 99
-    priority: 5
+    priority: 0
     <weight>k__BackingField: 10
     once: 1
     choices:
-    - label: SIT WITH HIM
-      result: By morning the bunk is empty. You fold the blanket and say nothing.
+    - label: LET HER SING
+      result: The vent hums back. The crew sleeps better. Nobody asks why.
+      survival: 0
+      science: 0
+      morale: 2
+      setFlag: essa_kept
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+    - label: SEAL THE DUCT
+      result: The grate goes quiet. She does not sing again.
       survival: -1
       science: 0
       morale: -1
@@ -248,33 +648,805 @@ MonoBehaviour:
       requirements: []
       lockHint: 
       removal:
-        selector: 1
-        cardId: mattew_sick
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: corwin_cough
+    title: THE COUGH
+    body: It is a dry cough. He says it is the dust. The dust has been in the air
+      since the burn. Nobody else is coughing. He says that means nothing. He is
+      probably right.
+    causeLine: The new hand coughs in the corridor.
+    conditions:
+    - kind: 0
+      tag: 7
+      role: 0
+      flag: 
+      stat: 0
+      value: 0
+    minTurn: 0
+    maxTurn: 99
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: LOG IT AS ALLERGY
+      result: The log says allergy. He keeps working. The cough keeps going.
+      survival: 0
+      science: 1
+      morale: -1
+      setFlag: cough_hidden
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+    - label: SEND HIM TO BUNK
+      result: He goes. The work slows. The corridor is quiet.
+      survival: -1
+      science: -1
+      morale: 1
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: yusuf_hands
+    title: SIX FINGERS
+    body: It is on the left hand. It is not a thumb. He uses it to reach a panel
+      nobody else can reach. The panel works better now. The log has no field for
+      the finger.
+    causeLine: The new engineer has an extra finger.
+    conditions:
+    - kind: 0
+      tag: 9
+      role: 0
+      flag: 
+      stat: 0
+      value: 0
+    minTurn: 0
+    maxTurn: 99
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: KEEP HIM
+      result: The panel stays fixed. The finger stays unlogged. The crew adjusts.
+      survival: 0
+      science: 1
+      morale: -1
+      setFlag: yusuf_spared
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+    - label: LOG THE ANOMALY
+      result: The log records it. The crew reads the log. The panel breaks again.
+      survival: 1
+      science: 0
+      morale: -2
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: fever_breaks
+    title: THE FEVER BREAKS
+    body: He has been quiet since the second day. Now the bunk is quiet in a different
+      way. The others have already decided what to do about it. They are waiting
+      for you to say it out loud.
+    causeLine: The sick man stops answering.
+    conditions:
+    - kind: 0
+      tag: 7
+      role: 0
+      flag: 
+      stat: 0
+      value: 0
+    minTurn: 2
+    maxTurn: 99
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: CALL THE MEDIC
+      result: She works for an hour. He breathes. Nobody thanks her.
+      survival: 1
+      science: 0
+      morale: 1
+      setFlag: 
+      requirements:
+      - kind: 0
+        tag: 5
+        role: 0
+        flag: 
+        stat: 0
+        value: 0
+      lockHint: NO MEDIC ON BOARD
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+    - label: SEAL THE BUNK
+      result: The door closes. The log records a name and nothing else.
+      survival: 0
+      science: 0
+      morale: -2
+      setFlag: bunk_sealed
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 2
+        cardId: 
         tag: 7
         role: 0
-  endings:
-  - id: default
-    title: THE LAST VOYAGE
-    body: 'The ark leaves with what it has: enough to survive, not enough to be sure.
-      Behind you, Earth is quiet. Ahead, a small green dot. It will have to do.'
+  - id: bunk_quiet
+    title: THE BUNK IS QUIET
+    body: The others walk past it. Nobody stops. The log has a line for the name.
+      The line is the only thing in the bunk now.
+    causeLine: The sealed door has not opened.
+    conditions:
+    - kind: 2
+      tag: 0
+      role: 0
+      flag: bunk_sealed
+      stat: 0
+      value: 0
+    - kind: 2
+      tag: 0
+      role: 0
+      flag: cough_hidden
+      stat: 0
+      value: 0
+    minTurn: 3
+    maxTurn: 99
     priority: 0
-    minSurvival: 0
-    minScience: 0
-    minMorale: 0
-    maxSurvival: 10
-    maxScience: 10
-    maxMorale: 10
-    requiredFlags: []
-    forbiddenFlags: []
-    requiredTags: 
-    forbiddenTags: 
-  - id: dead_survival
-    title: THE LIGHTS GO OUT
-    body: The recyclers died on the fourth day. After that you counted the breaths.
-      There were fewer every hour. The ark is still out there, drifting, full of
-      people who no longer need anything.
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: SIT BY THE DOOR
+      result: You sit. The door does not open. After an hour you leave.
+      survival: 0
+      science: 0
+      morale: 1
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: reactor_strain
+    title: THE REACTOR STRAINS
+    body: The gauge is in the red. The engineer says it is fine. The gauge disagrees.
+      Opening the core would vent the heat. It would also vent the shielding.
+    causeLine: The core has been running hot for two days.
+    conditions:
+    - kind: 0
+      tag: 0
+      role: 0
+      flag: 
+      stat: 0
+      value: 0
+    minTurn: 2
+    maxTurn: 99
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: OPEN THE CORE
+      result: The heat vents. The gauge drops. The shielding goes with it.
+      survival: 2
+      science: 1
+      morale: -2
+      setFlag: reactor_open
+      requirements:
+      - kind: 2
+        tag: 0
+        role: 0
+        flag: oskar_vented
+        stat: 0
+        value: 0
+      lockHint: NO VENT REPORT
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+    - label: RUN IT COLD
+      result: The gauge holds. The output drops. The lights dim.
+      survival: 0
+      science: -1
+      morale: 1
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: seed_count
+    title: THE SEED COUNT
+    body: She has a number. The number is smaller than yesterday. The seeds are in
+      a locker with a lock nobody has the key to. She has the key. She is not using
+      it.
+    causeLine: The farmer has been counting the seeds.
+    conditions:
+    - kind: 0
+      tag: 8
+      role: 0
+      flag: 
+      stat: 0
+      value: 0
+    minTurn: 2
+    maxTurn: 99
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: SAVE THE SEED
+      result: The locker stays locked. The number stays the same. Dinner is smaller.
+      survival: 1
+      science: 1
+      morale: -1
+      setFlag: seed_saved
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+    - label: EAT IT
+      result: The lock opens. Dinner is bigger. The number drops.
+      survival: 1
+      science: 0
+      morale: 0
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: soldier_round
+    title: ROUNDS AT NIGHT
+    body: The soldier has been checking the airlock. He has also been checking the
+      crew. He does not say which he trusts less. The rounds are not in the log.
+    causeLine: Someone is walking the corridor at night.
+    conditions:
+    - kind: 0
+      tag: 4
+      role: 0
+      flag: 
+      stat: 0
+      value: 0
+    minTurn: 3
+    maxTurn: 99
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: TAKE THE ROUNDS
+      result: The rounds stop. The airlock stays shut. The crew sleeps.
+      survival: 1
+      science: 0
+      morale: -1
+      setFlag: soldier_disarmed
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 3
+        cardId: 
+        tag: 0
+        role: 2
+    - label: LET HIM KEEP THEM
+      result: The rounds continue. The corridor is quieter. Nobody sleeps.
+      survival: 0
+      science: 0
+      morale: 1
+      setFlag: 
+      requirements:
+      - kind: 2
+        tag: 0
+        role: 0
+        flag: mutant_kept
+        stat: 0
+        value: 0
+      lockHint: NO MUTANT ABOARD
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: child_question
+    title: A QUESTION AT DINNER
+    body: She asks what happens if the ship does not stop. The manual has an answer.
+      The answer is three pages long. She has read all three pages. She is waiting
+      for you to say it.
+    causeLine: The child has been reading the ship manual.
+    conditions:
+    - kind: 0
+      tag: 3
+      role: 0
+      flag: 
+      stat: 0
+      value: 0
+    minTurn: 2
+    maxTurn: 99
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: ANSWER HONESTLY
+      result: You tell her. She nods. She does not ask again.
+      survival: 0
+      science: 1
+      morale: -1
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+    - label: CHANGE THE SUBJECT
+      result: You talk about the weather. There is no weather. She lets it go.
+      survival: 0
+      science: 0
+      morale: 1
+      setFlag: 
+      requirements:
+      - kind: 0
+        tag: 1
+        role: 0
+        flag: 
+        stat: 0
+        value: 0
+      lockHint: NO ONE STUBBORN
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: hungry_turn
+    title: THE WATER TASTES OF IRON
+    body: The water is brown. The filter is older than the ship. The farmer says
+      the last ration is still in the locker. The locker is not locked. Nobody has
+      opened it.
+    causeLine: The recycler has been running dry.
+    conditions:
+    - kind: 8
+      tag: 0
+      role: 0
+      flag: 
+      stat: 0
+      value: 3
+    minTurn: 0
+    maxTurn: 99
+    priority: 10
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: OPEN THE RATION
+      result: The locker opens. The water clears. The last ration is gone.
+      survival: 2
+      science: 0
+      morale: -1
+      setFlag: 
+      requirements:
+      - kind: 0
+        tag: 8
+        role: 0
+        flag: 
+        stat: 0
+        value: 0
+      lockHint: NO FARMER LEFT
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+    - label: WAIT
+      result: The water stays brown. Nobody drinks. The recycler runs.
+      survival: 0
+      science: 0
+      morale: -2
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: morale_low
+    title: NOBODY SIGNS THE LOG
+    body: The captain's page is blank. The crew's pages are blank. The pen is on
+      the desk. Nobody has touched it. The silence is not hostile. It is worse than
+      hostile.
+    causeLine: The log has been empty for two days.
+    conditions:
+    - kind: 8
+      tag: 0
+      role: 0
+      flag: 
+      stat: 2
+      value: 3
+    minTurn: 0
+    maxTurn: 99
+    priority: 10
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: GIVE A SPEECH
+      result: You talk for ten minutes. Someone signs the log after.
+      survival: 0
+      science: 0
+      morale: 2
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+    - label: SAY NOTHING
+      result: The silence holds. The log stays empty. The lights stay on.
+      survival: 1
+      science: 0
+      morale: -1
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: crew_thin
+    title: TOO FEW HANDS
+    body: Two people on the roster. Three shifts. The math does not work. Nobody
+      has said it out loud. The roster is on the wall. The gaps are visible.
+    causeLine: The watch rotation has gaps in it.
+    conditions:
+    - kind: 9
+      tag: 0
+      role: 0
+      flag: 
+      stat: 0
+      value: 2
+    minTurn: 0
+    maxTurn: 99
+    priority: 10
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: WORK DOUBLE SHIFTS
+      result: The shifts fill. The crew does not sleep. The work gets done.
+      survival: 1
+      science: 0
+      morale: -2
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+    - label: LET IT SLIDE
+      result: The shifts stay empty. Nothing breaks. The crew sleeps.
+      survival: -1
+      science: 0
+      morale: 1
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: mutant_rumor
+    title: WHAT THE SCAN SHOWS
+    body: The scan is clean. The scan is too clean. The mutant has been in the same
+      room as the scanner for three days. Nobody has asked what the scanner was looking
+      for.
+    causeLine: The scanner has been running all night.
+    conditions:
+    - kind: 0
+      tag: 9
+      role: 0
+      flag: 
+      stat: 0
+      value: 0
+    minTurn: 3
+    maxTurn: 99
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: RUN THE SCAN
+      result: The scan runs again. The result is the same. Nobody is convinced.
+      survival: 0
+      science: 1
+      morale: -1
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+    - label: KEEP IT QUIET
+      result: The scanner goes dark. The crew stops asking. The room stays quiet.
+      survival: 0
+      science: 0
+      morale: 1
+      setFlag: mutant_kept
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: stubborn_wall
+    title: THE SAME ARGUMENT
+    body: The argument is about the water filter. It has been about the water filter
+      for three days. Neither of them is wrong. Neither of them will stop. The filter
+      is still broken.
+    causeLine: Two crew have been arguing since breakfast.
+    conditions:
+    - kind: 0
+      tag: 1
+      role: 0
+      flag: 
+      stat: 0
+      value: 0
+    minTurn: 3
+    maxTurn: 99
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: LET THEM ARGUE
+      result: The argument continues. The filter stays broken. The crew adjusts.
+      survival: 0
+      science: 0
+      morale: -1
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+    - label: PICK A SIDE
+      result: You pick a side. The other side stops talking to you.
+      survival: 1
+      science: 0
+      morale: -1
+      setFlag: 
+      requirements:
+      - kind: 0
+        tag: 1
+        role: 0
+        flag: 
+        stat: 0
+        value: 0
+      lockHint: NO ONE STUBBORN
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: dreamer_map
+    title: A MAP ON THE WALL
+    body: It is a map of the surface. The surface is dead. The map has rivers on
+      it. The rivers are wrong. The dreamer says they are not wrong. The dreamer
+      says the map is old.
+    causeLine: Someone has been drawing on the bulkhead.
+    conditions:
+    - kind: 0
+      tag: 6
+      role: 0
+      flag: 
+      stat: 0
+      value: 0
+    - kind: 2
+      tag: 0
+      role: 0
+      flag: essa_kept
+      stat: 0
+      value: 0
+    minTurn: 4
+    maxTurn: 99
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: FOLLOW THE MAP
+      result: You follow the map. The rivers are not there. The dreamer is not surprised.
+      survival: 0
+      science: 1
+      morale: 1
+      setFlag: map_followed
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+    - label: BURN IT
+      result: The bulkhead is clean. The dreamer stops drawing. The wall is blank.
+      survival: 1
+      science: 0
+      morale: -2
+      setFlag: 
+      requirements:
+      - kind: 0
+        tag: 6
+        role: 0
+        flag: 
+        stat: 0
+        value: 0
+      lockHint: NO DREAMER LEFT
+      removal:
+        selector: 2
+        cardId: 
+        tag: 6
+        role: 0
+  - id: science_push
+    title: THE LAB IS COLD
+    body: The incubator is at the wrong temperature. It has been at the wrong temperature
+      for a day. The scientist has not slept. The cultures are not growing. The scientist
+      is still watching them.
+    causeLine: The cultures have stopped growing.
+    conditions:
+    - kind: 8
+      tag: 0
+      role: 0
+      flag: 
+      stat: 1
+      value: 3
+    - kind: 0
+      tag: 2
+      role: 0
+      flag: 
+      stat: 0
+      value: 0
+    minTurn: 2
+    maxTurn: 99
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: LOG THE FAILURE
+      result: The log records the temperature. The cultures stay cold. The scientist
+        sleeps.
+      survival: 0
+      science: 1
+      morale: 0
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: medic_round
+    title: THE MEDIC MAKES ROUNDS
+    body: She checks the same bunk twice. She does not say why. The second check
+      is shorter. She writes nothing in the log. The pen is dry.
+    causeLine: The medic has been checking every bunk.
+    conditions:
+    - kind: 0
+      tag: 5
+      role: 0
+      flag: 
+      stat: 0
+      value: 0
+    minTurn: 4
+    maxTurn: 99
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: LET HER WORK
+      result: She finishes the rounds. The log stays empty. The bunks are quiet.
+      survival: 0
+      science: 0
+      morale: 1
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  - id: empty_mess
+    title: EMPTY MESS
+    body: There are three of you. The fourth place is set anyway. Nobody has moved
+      it. The plates are clean. The chairs are pushed in. The mess hall is very quiet.
+    causeLine: The mess hall has been set for four.
+    conditions:
+    - kind: 9
+      tag: 0
+      role: 0
+      flag: 
+      stat: 0
+      value: 3
+    minTurn: 3
+    maxTurn: 99
+    priority: 0
+    <weight>k__BackingField: 10
+    once: 1
+    choices:
+    - label: EAT ALONE
+      result: You eat alone. The fourth place stays set. Nobody clears it.
+      survival: 0
+      science: 0
+      morale: -1
+      setFlag: 
+      requirements: []
+      lockHint: 
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+    - label: SIT TOGETHER
+      result: You sit together. The fourth place stays set. The food is shared.
+      survival: 0
+      science: 0
+      morale: 1
+      setFlag: 
+      requirements:
+      - kind: 2
+        tag: 0
+        role: 0
+        flag: seed_saved
+        stat: 0
+        value: 0
+      lockHint: NO SEED TO SHARE
+      removal:
+        selector: 0
+        cardId: 
+        tag: 0
+        role: 0
+  endings:
+  - id: end_no_air
+    title: NO AIR
+    body: The gauge hits zero. The recycler stops. The crew has been holding its
+      breath for two days. The log records the last reading. The pen is still in
+      the holder.
     priority: 100
-    minSurvival: -10
+    minSurvival: 0
     minScience: 0
     minMorale: 0
     maxSurvival: 0
@@ -284,13 +1456,14 @@ MonoBehaviour:
     forbiddenFlags: []
     requiredTags: 
     forbiddenTags: 
-  - id: dead_science
-    title: NO ONE REMEMBERS HOW
-    body: The reactor failed at 03:14. Everyone stood in the corridor, waiting for
-      someone who knew what to do. Nobody did. The ark became a very expensive coffin.
+  - id: end_no_signal
+    title: NO SIGNAL
+    body: The science station goes dark. The samples are still in the fridge. The
+      fridge is still cold. Nobody knows how to run the fridge. The log has a line
+      for this. The line is blank.
     priority: 100
     minSurvival: 0
-    minScience: -10
+    minScience: 0
     minMorale: 0
     maxSurvival: 10
     maxScience: 0
@@ -299,14 +1472,15 @@ MonoBehaviour:
     forbiddenFlags: []
     requiredTags: 
     forbiddenTags: 
-  - id: dead_morale
-    title: THE CREW STOPS LISTENING
-    body: They stopped answering on the third day. By the sixth, the bridge was empty.
-      The ark sails on, but there is no one left who wants to arrive.
+  - id: end_no_voice
+    title: NO VOICE
+    body: The crew stops talking. The log stops being written. The ship runs. The
+      lights are on. The seats are filled. Nobody is in them. The ship is doing fine.
+      The ship is doing fine.
     priority: 100
     minSurvival: 0
     minScience: 0
-    minMorale: -10
+    minMorale: 0
     maxSurvival: 10
     maxScience: 10
     maxMorale: 0
@@ -314,11 +1488,81 @@ MonoBehaviour:
     forbiddenFlags: []
     requiredTags: 
     forbiddenTags: 
-  - id: eden
-    title: NEW EDEN
-    body: The door opens on soil that has never been farmed. Someone laughs. A child
-      runs ahead before anyone can stop her. For the first time in nine days, nobody
-      is counting.
+  - id: end_order
+    title: ORDER
+    body: The orders stand. The rounds are counted. The crew obeys without being
+      asked. The log is full. The log is clean. The ship runs on time. Nobody remembers
+      who wrote the first order. It does not matter. The order is the ship now.
+    priority: 72
+    minSurvival: 5
+    minScience: 0
+    minMorale: 0
+    maxSurvival: 10
+    maxScience: 10
+    maxMorale: 10
+    requiredFlags:
+    - tamsin_oath
+    - soldier_disarmed
+    forbiddenFlags: []
+    requiredTags: 
+    forbiddenTags: 
+  - id: end_reactor_priest
+    title: THE REACTOR PRIEST
+    body: The core is open. The shielding is gone. The engineer who opened it is
+      still in the room. The room is warm. The ship is warm. The crew does not go
+      near the room. The log says the reactor is fine. The log is written by the
+      reactor now.
+    priority: 70
+    minSurvival: 0
+    minScience: 6
+    minMorale: 0
+    maxSurvival: 10
+    maxScience: 10
+    maxMorale: 10
+    requiredFlags:
+    - reactor_open
+    forbiddenFlags: []
+    requiredTags: 00000000
+    forbiddenTags: 
+  - id: end_mapped
+    title: THE MAP WAS RIGHT
+    body: The rivers are there. The map was old, not wrong. The dreamer is not surprised.
+      The ship follows the rivers. The rivers are not water. The rivers are something
+      else. The log has a new entry. The entry is a drawing.
+    priority: 65
+    minSurvival: 0
+    minScience: 0
+    minMorale: 5
+    maxSurvival: 10
+    maxScience: 10
+    maxMorale: 10
+    requiredFlags:
+    - map_followed
+    forbiddenFlags: []
+    requiredTags: 06000000
+    forbiddenTags: 
+  - id: end_clean_air
+    title: CLEAN AIR
+    body: The bunk is sealed. The sick man is gone. The air is clean. The crew breathes
+      without thinking about it. The log has a name in it. The name is the only thing
+      in the bunk. The air is very clean.
+    priority: 60
+    minSurvival: 0
+    minScience: 0
+    minMorale: 0
+    maxSurvival: 10
+    maxScience: 10
+    maxMorale: 10
+    requiredFlags:
+    - bunk_sealed
+    forbiddenFlags: []
+    requiredTags: 
+    forbiddenTags: 07000000
+  - id: end_all_high
+    title: ALL HANDS
+    body: The numbers are good. The crew is fed. The lab is warm. The log is full.
+      The ship is not dying. It is not living either. It is holding. The crew calls
+      this a victory. The log does not use that word.
     priority: 50
     minSurvival: 7
     minScience: 7
@@ -330,14 +1574,196 @@ MonoBehaviour:
     forbiddenFlags: []
     requiredTags: 
     forbiddenTags: 
+  - id: end_lab
+    title: THE LAB
+    body: The science station is the warmest room on the ship. The crew does not
+      go in. The samples are labeled. The labels are correct. The lab runs all night.
+      The crew sleeps. The ship is a laboratory now. The laboratory is doing fine.
+    priority: 50
+    minSurvival: 0
+    minScience: 7
+    minMorale: 0
+    maxSurvival: 6
+    maxScience: 10
+    maxMorale: 6
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 
+    forbiddenTags: 
+  - id: end_choir
+    title: THE CHOIR
+    body: The crew sings. Nobody knows when it started. The log has a line for it.
+      The line is a note. The note is not in any of the manuals. The ship runs. The
+      crew sings. The singing is not a celebration. It is a habit.
+    priority: 50
+    minSurvival: 0
+    minScience: 0
+    minMorale: 7
+    maxSurvival: 6
+    maxScience: 6
+    maxMorale: 10
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 
+    forbiddenTags: 
+  - id: end_hold
+    title: HOLD
+    body: The ship holds. The numbers are good. The crew is fed. The log is clean.
+      The ship does not move. It holds. The holding is the whole plan. The plan is
+      working. The log says so. The log is written by the captain. The captain is
+      holding too.
+    priority: 50
+    minSurvival: 7
+    minScience: 0
+    minMorale: 0
+    maxSurvival: 10
+    maxScience: 6
+    maxMorale: 6
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 
+    forbiddenTags: 
+  - id: end_drift
+    title: DRIFT
+    body: The ship drifts. The numbers are not good or bad. The crew is not happy
+      or sad. The log has entries. The entries are short. The ship is still going.
+      Nobody knows where. The drift is not a failure. It is not a success. It is
+      a drift.
+    priority: 0
+    minSurvival: 0
+    minScience: 0
+    minMorale: 0
+    maxSurvival: 10
+    maxScience: 10
+    maxMorale: 10
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 
+    forbiddenTags: 
   synergies:
-  - id: engineer_scientist
+  - id: syn_eng_sol
     tagA: 0
-    tagB: 2
+    tagB: 4
     countB: 1
     survival: 1
+    science: 0
+    morale: -1
+    setFlag: 
+    text: The engineer builds it. The soldier aims it.
+  - id: syn_med_sick
+    tagA: 5
+    tagB: 7
+    countB: 1
+    survival: 1
+    science: 0
+    morale: 1
+    setFlag: 
+    text: She has one patient and no supplies. She improvises.
+  - id: syn_eng_eng
+    tagA: 0
+    tagB: 0
+    countB: 2
+    survival: 1
     science: 1
+    morale: -1
+    setFlag: 
+    text: Two engineers means one argument per bolt.
+  - id: syn_child_dream
+    tagA: 3
+    tagB: 6
+    countB: 1
+    survival: 0
+    science: 0
+    morale: 2
+    setFlag: 
+    text: The child asks what the stars are called. Someone answers.
+  - id: syn_sick_sick
+    tagA: 7
+    tagB: 7
+    countB: 2
+    survival: -1
+    science: 0
+    morale: -1
+    setFlag: 
+    text: They share a bunk. They share everything now.
+  - id: syn_sol_mut
+    tagA: 4
+    tagB: 9
+    countB: 1
+    survival: 0
+    science: 0
+    morale: -2
+    setFlag: 
+    text: The soldier sleeps with the locker key on a string.
+  - id: syn_farm_stub
+    tagA: 8
+    tagB: 1
+    countB: 1
+    survival: 1
+    science: 0
     morale: 0
     setFlag: 
-    text: The lights hold. The lab hums. For a moment the ark feels like a ship,
-      not a lifeboat.
+    text: The soil is bad. She plants anyway. The soil loses.
+  - id: syn_sci_mut
+    tagA: 2
+    tagB: 9
+    countB: 1
+    survival: 0
+    science: 1
+    morale: -1
+    setFlag: 
+    text: The sample is labelled. The sample is also crew.
+  - id: syn_med_med
+    tagA: 5
+    tagB: 5
+    countB: 2
+    survival: 1
+    science: 0
+    morale: 0
+    setFlag: 
+    text: One keeps the log. One keeps the hands steady.
+  - id: syn_child_sick
+    tagA: 3
+    tagB: 7
+    countB: 1
+    survival: 0
+    science: 0
+    morale: -1
+    setFlag: 
+    text: The child is not allowed near that bunk. She goes anyway.
+  - id: syn_stub_stub
+    tagA: 1
+    tagB: 1
+    countB: 2
+    survival: -1
+    science: 0
+    morale: 1
+    setFlag: 
+    text: Nobody backs down. Somehow the work still gets done.
+  - id: syn_dream_sick
+    tagA: 6
+    tagB: 7
+    countB: 1
+    survival: 0
+    science: -1
+    morale: 1
+    setFlag: 
+    text: He describes the surface. Some of it is invented.
+  - id: syn_eng_mut
+    tagA: 0
+    tagB: 9
+    countB: 1
+    survival: 0
+    science: 1
+    morale: -1
+    setFlag: 
+    text: The hands fit where the tools do not. Nobody records it.
+  - id: syn_farm_farm
+    tagA: 8
+    tagB: 8
+    countB: 2
+    survival: 1
+    science: 0
+    morale: 1
+    setFlag: 
+    text: Two sets of rows. One harvest.

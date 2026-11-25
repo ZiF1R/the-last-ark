@@ -10,6 +10,9 @@ public class GameFlow : MonoBehaviour
 	public ContentDatabase db;
 	public Image fader;
 
+	[Header("Title")]
+	[SerializeField] GameObject titlePanel;
+
 	[Header("Pacing (seconds, unscaled)")]
 	[SerializeField] float faderDuration = 0.8f;
 	[SerializeField] float pickSettle = 0.25f;
@@ -33,8 +36,34 @@ public class GameFlow : MonoBehaviour
 	{
 		_phase = Phase.Title;
 		_faderImage = fader.GetComponent<Image>();
-		SetFaderAlpha(1f);
 
+		if (titlePanel != null)
+		{
+			SetFaderAlpha(0f);
+			titlePanel.SetActive(true);
+			return;
+		}
+
+		SetFaderAlpha(1f);
+		StartRun();
+	}
+
+	/// <summary>Called by the title screen button.</summary>
+	public void BeginRun()
+	{
+		if (titlePanel == null)
+		{
+			StartRun();
+			return;
+		}
+
+		StartCoroutine(BeginRunRoutine());
+	}
+
+	IEnumerator BeginRunRoutine()
+	{
+		yield return FadeTo(1f, faderDuration * 0.5f);
+		titlePanel.SetActive(false);
 		StartRun();
 	}
 
@@ -70,7 +99,7 @@ public class GameFlow : MonoBehaviour
 
 	private IEnumerator FadeTo(float target, float duration)
 	{
-		float start = 1f;
+		float start = _faderImage.color.a;
 		float elapsed = 0f;
 
 		while (elapsed < duration)
@@ -99,7 +128,6 @@ public class GameFlow : MonoBehaviour
 		}
 
 		_phase = Phase.Resolve;
-		//_phase = Phase.Draft;
 
 		_state.turn++;
 		StatDelta tick = TurnTick.Apply(_state);

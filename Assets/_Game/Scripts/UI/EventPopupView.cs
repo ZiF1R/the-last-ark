@@ -121,7 +121,7 @@ public class EventPopupView : MonoBehaviour
 				else
 				{
 					string hint = ch.GetLockHint(state);
-					choiceLabels[i].text = $"{ch.label}\n<size=70%><color=#{ColorUtility.ToHtmlStringRGB(hintColor)}>{hint}</color></size>";
+					choiceLabels[i].text = $"{ch.label}\n<size={UITheme.FsMicro}><color=#{UITheme.Html(hintColor)}>{hint}</color></size>";
 					choiceLabels[i].color = labelLocked;
 				}
 			}
@@ -183,9 +183,10 @@ public class EventPopupView : MonoBehaviour
 		if (lost != null)
 		{
 			string lostLine = $"LOST: {lost.displayName}";
+			string lostHex = UITheme.Html(UITheme.Danger);
 			text = string.IsNullOrEmpty(text)
 				? lostLine
-				: $"{text}\n\n<size=85%><color=#B4544E>{lostLine}</color></size>";
+				: $"{text}\n\n<size={UITheme.FsMicro}><color=#{lostHex}>{lostLine}</color></size>";
 		}
 
 		if (_typing != null)
@@ -195,9 +196,15 @@ public class EventPopupView : MonoBehaviour
 		}
 
 		bool hasResult = !string.IsNullOrEmpty(text);
+
+		string chosen = $"<size={UITheme.FsMicro}><color=#{UITheme.Html(UITheme.Muted)}>YOU CHOSE: {choice.label.ToUpperInvariant()}</color></size>";
+		text = hasResult ? chosen + "\n\n" + text : chosen;
+
 		resultText.text = text;
-		resultText.gameObject.SetActive(hasResult);
-		bodyText.gameObject.SetActive(!hasResult);
+		resultText.gameObject.SetActive(true);
+		// The body stays on screen on purpose: wiping it removes the context of the
+		// choice that was just made.
+		bodyText.gameObject.SetActive(true);
 
 		resultBlock.SetActive(true);
 
