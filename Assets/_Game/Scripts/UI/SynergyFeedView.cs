@@ -92,7 +92,11 @@ public class SynergyFeedView : MonoBehaviour
 			yield break;
 		}
 
-		if (line != null) line.text = sb.ToString();
+		if (line != null)
+		{
+			line.text = sb.ToString();
+			FitToContent();
+		}
 
 		yield return Fade(0f, 1f, fadeIn);
 		yield return new WaitForSecondsRealtime(hold + holdPerExtraLine * Mathf.Max(0, count - 1));
@@ -102,6 +106,42 @@ public class SynergyFeedView : MonoBehaviour
 
 		if (_queue.Count > 0 && isActiveAndEnabled)
 			_runner = StartCoroutine(ShowBatch());
+	}
+
+	/// <summary>
+	/// The toast is a top-anchored strip: growing it only extends it downward.
+	/// The 88px minimum matches the authored height, +24 mirrors the skin's
+	/// 12px top/bottom margins on the Line, so the panel always covers the text.
+	/// </summary>
+	void FitToContent()
+	{
+		var rt = (RectTransform)transform;
+
+		Canvas.ForceUpdateCanvases();
+		float height = Mathf.Max(88f, line != null ? line.preferredHeight + 24f : 88f);
+
+		Vector2 size = rt.sizeDelta;
+		size.y = height;
+		rt.sizeDelta = size;
+	}
+
+	/// <summary>Editor/capture helper: stages a batched toast without playing it.</summary>
+	public void Stage(string[] lines)
+	{
+		if (line == null || lines == null || lines.Length == 0) return;
+
+		var sb = new StringBuilder();
+
+		for (int i = 0; i < lines.Length; i++)
+		{
+			if (i > 0) sb.Append("\n\n");
+			sb.Append(lines[i]);
+		}
+
+		line.text = sb.ToString();
+		FitToContent();
+
+		if (group != null) group.alpha = 1f;
 	}
 
 	IEnumerator Fade(float from, float to, float duration)

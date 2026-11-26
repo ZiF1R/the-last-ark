@@ -79,6 +79,11 @@ public static class PixelArtCapture
 		SpawnCards();
 		Shot(cam, rt, width, height, "02_draft_" + tag);
 
+		// ---- 2b. a batched synergy toast over the draft (regression: overflowed the panel)
+		StageSynergyToast();
+		Shot(cam, rt, width, height, "07_synergy_" + tag);
+		ClearSynergyToast();
+
 		// ---- 3. event
 		Panel("EventPanel", true);
 		DressEvent();
@@ -294,8 +299,41 @@ public static class PixelArtCapture
 		}
 	}
 
-	static void DressArk()
+	static void StageSynergyToast()
 	{
+		Transform feed = Find("UI/Canvas/SynergyFeed");
+		if (feed == null) return;
+
+		var view = feed.GetComponent<SynergyFeedView>();
+		if (view == null) return;
+
+		string accent = UITheme.Html(UITheme.Muted);
+
+		view.Stage(new[]
+		{
+			$"<size={UITheme.FsMicro}><color=#{accent}>SYNERGY</color></size>\nSOLDIER + MEDIC × 2\n<size={UITheme.FsBody}><color=#{UITheme.Html(UITheme.Surv)}>+1 SURVIVAL</color></size>",
+			$"<size={UITheme.FsMicro}><color=#{accent}>SYNERGY</color></size>\nBIOLOG + CHILD\n<size={UITheme.FsBody}><color=#{UITheme.Html(UITheme.Sci)}>+2 SCIENCE</color></size>",
+			$"<size={UITheme.FsMicro}><color=#{UITheme.Html(UITheme.Danger)}>SYNERGY</color></size>\nSICK × 2\n<size={UITheme.FsBody}><color=#{UITheme.Html(UITheme.Danger)}>-1 MORALE</color></size>"
+		});
+	}
+
+	static void ClearSynergyToast()
+	{
+		Transform feed = Find("UI/Canvas/SynergyFeed");
+		if (feed == null) return;
+
+		var group = feed.GetComponent<CanvasGroup>();
+		if (group != null) group.alpha = 0f;
+
+		Transform line = feed.Find("Line");
+		if (line != null)
+		{
+			var text = line.GetComponent<TMP_Text>();
+			if (text != null) text.text = string.Empty;
+		}
+	}
+
+	static void DressArk()	{
 		Transform rail = Find("UI/Canvas/GameScreen/ArkRail");
 		if (rail == null) return;
 

@@ -838,7 +838,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -3172,7 +3172,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 120, y: 144}
+  m_SizeDelta: {x: 0, y: 144}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &416982183
 MonoBehaviour:
@@ -5167,7 +5167,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 120, y: 144}
+  m_SizeDelta: {x: 0, y: 144}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &708609354
 MonoBehaviour:
@@ -6047,7 +6047,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 120, y: 144}
+  m_SizeDelta: {x: 0, y: 144}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &844662419
 MonoBehaviour:
@@ -7819,7 +7819,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -9660,7 +9660,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 120, y: 144}
+  m_SizeDelta: {x: 0, y: 144}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1376720117
 MonoBehaviour:
@@ -10042,7 +10042,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 120, y: 144}
+  m_SizeDelta: {x: 0, y: 144}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1451390005
 MonoBehaviour:
@@ -10657,7 +10657,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -96, y: 20}
+  m_AnchoredPosition: {x: -96, y: 0}
   m_SizeDelta: {x: 430, y: 40}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &1578636075
@@ -11963,7 +11963,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 120, y: 144}
+  m_SizeDelta: {x: 0, y: 144}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1734253243
 MonoBehaviour:
@@ -14450,7 +14450,7 @@ MonoBehaviour:
   group: {fileID: 2146932036}
   fadeIn: 0.15
   hold: 3
-  holdPerExtraLine: 1
+  holdPerExtraLine: 0.5
   fadeOut: 0.35
   neutral: {r: 0.54, g: 0.56, b: 0.55, a: 1}
   bad: {r: 0.79, g: 0.34, b: 0.29, a: 1}
