@@ -14,7 +14,7 @@ using UnityEngine.UI;
 public static class PixelArtCapture
 {
 	const string ScenePath = "Assets/Scenes/MainScene.unity";
-	const string OutDir = "Temp/Shots";
+	const string OutDir = "Logs/Shots";
 
 	static readonly List<GameObject> Spawned = new List<GameObject>();
 	static Canvas _canvas;

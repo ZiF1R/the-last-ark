@@ -22,7 +22,7 @@ public static class PixelArtTheme
 	const string FontDir    = "Assets/_Game/Art/Fonts";
 	const string UiDir      = "Assets/_Game/Art/Ui";
 	const string IconDir    = "Assets/_Game/Art/Icons";
-	const string ReportPath = "Temp/ark_theme_report.txt";
+	const string ReportPath = "Logs/ark_theme_report.txt";
 
 	static readonly StringBuilder Journal = new StringBuilder();
 
@@ -301,6 +301,29 @@ public static class PixelArtTheme
 		text.raycastTarget = false;
 		text.richText = true;
 
+		// A box shorter than a single line of its font plus ellipsis overflow
+		// makes TMP drop the line entirely instead of truncating it (this is
+		// how the card title went missing). Give such boxes the line they need.
+		if (ellipsis && font != null)
+		{
+			var rt = text.rectTransform;
+			float line = size * (font.faceInfo.lineHeight / font.faceInfo.pointSize);
+
+			if (rt.rect.height + 0.01f < line)
+			{
+				if (rt.pivot.y > 0.99f)
+				{
+					Vector2 sizeDelta = rt.sizeDelta;
+					sizeDelta.y = line;
+					rt.sizeDelta = sizeDelta;
+				}
+				else
+				{
+					Say("text box too short: " + text.name + " " + rt.rect.height.ToString("0") + " < " + line.ToString("0"));
+				}
+			}
+		}
+
 		// TMP keeps a second, serialized copy of the colour and builds the glyph
 		// vertices from that one. .color only writes the first copy, so a prefab
 		// or scene saved by an editor script would bake the previous colour in.
@@ -369,6 +392,20 @@ public static class PixelArtTheme
 		return child != null ? child.gameObject : Node(name, parent);
 	}
 
+	/// <summary>
+	/// Replaces a text component with a brand new one. A TMP component that was
+	/// only ever edited in the inspector can end up in a state where a script
+	/// cannot make it build any glyphs (the card title rendered nothing at all
+	/// while a fresh component with identical settings worked), so the prefab
+	/// gets a clean component instead of a patched one.
+	/// </summary>
+	static TMP_Text Fresh(Transform host)
+	{
+		var old = host.GetComponent<TMP_Text>();
+		if (old != null) UnityEngine.Object.DestroyImmediate(old, true);
+		return host.gameObject.AddComponent<TextMeshProUGUI>();
+	}
+
 	// ---------------------------------------------------------------- card prefab
 
 	static void ApplyCardPrefab()
@@ -378,34 +415,16 @@ public static class PixelArtTheme
 		try
 		{
 			var rt = (RectTransform)root.transform;
-			rt.sizeDelta = new Vector2(400f, 600f);
+			rt.sizeDelta = new Vector2(400f, 568f);
 
 			var element = root.GetComponent<LayoutElement>() ?? root.AddComponent<LayoutElement>();
 			element.preferredWidth = 400f;
-			element.preferredHeight = 600f;
+			element.preferredHeight = 568f;
 
 			var frame = root.GetComponent<Image>();
 			SkinImage(frame, _panel, Color.white);
 
 			string[] roles = { "biolog", "engineer", "soldier", "medic", "child", "sick", "farmer", "mutant" };
-
-			var view = root.GetComponent<CardView>();
-			if (view != null)
-			{
-				var so = new SerializedObject(view);
-				so.FindProperty("hoverFrame").objectReferenceValue = _panelLit;
-
-				var roleIcons = so.FindProperty("roleIcons");
-				roleIcons.arraySize = roles.Length;
-				for (int i = 0; i < roles.Length; i++)
-					roleIcons.GetArrayElementAtIndex(i).objectReferenceValue = Icon(roles[i]);
-
-				var band = root.transform.Find("TopBand");
-				if (band != null)
-					so.FindProperty("topBand").objectReferenceValue = band.GetComponent<Image>();
-
-				so.ApplyModifiedPropertiesWithoutUndo();
-			}
 
 			// ---- top band
 			Transform bandT = root.transform.Find("TopBand");
@@ -435,63 +454,77 @@ public static class PixelArtTheme
 
 			// ---- name
 			Transform nameT = root.transform.Find("Name");
+			TMP_Text nameLabel = null;
 			if (nameT != null)
 			{
-				FromTop((RectTransform)nameT, 168f, 368f, 56f);
-				SkinText(nameT.GetComponent<TMP_Text>(), _fontBold, UITheme.FsName, UITheme.Bone,
-					TextAlignmentOptions.Center, false, true);
-				nameT.GetComponent<TMP_Text>().text = "NAME";
+				// 48pt Silkscreen needs a 61px line box; anything shorter makes TMP
+				// truncate the line to nothing before it ever reaches the screen.
+				FromTop((RectTransform)nameT, 160f, 368f, 64f);
+				nameLabel = Fresh(nameT);
+				SkinText(nameLabel, _fontBold, UITheme.FsName, UITheme.Bone,
+					TextAlignmentOptions.Center, false, false);
+				nameLabel.text = "NAME";
 			}
 
 			// ---- role
 			Transform roleT = root.transform.Find("Role");
+			TMP_Text roleLabel = null;
 			if (roleT != null)
 			{
-				FromTop((RectTransform)roleT, 232f, 368f, 24f);
-				SkinText(roleT.GetComponent<TMP_Text>(), _font, UITheme.FsMicro, UITheme.Muted,
+				FromTop((RectTransform)roleT, 224f, 368f, 24f);
+				roleLabel = Fresh(roleT);
+				SkinText(roleLabel, _font, UITheme.FsMicro, UITheme.Muted,
 					TextAlignmentOptions.Center, false, true);
-				roleT.GetComponent<TMP_Text>().text = "ROLE";
+				roleLabel.text = "ROLE";
 			}
 
 			// ---- divider
 			Transform divT = root.transform.Find("Divider");
 			if (divT != null)
 			{
-				FromTop((RectTransform)divT, 264f, 336f, 4f);
+				FromTop((RectTransform)divT, 256f, 336f, 4f);
 				SkinImage(divT.GetComponent<Image>(), _divider, UITheme.Line, Image.Type.Simple);
 			}
 
 			// ---- quote
 			Transform quoteT = root.transform.Find("Quote");
+			TMP_Text quoteLabel = null;
 			if (quoteT != null)
 			{
-				FromTop((RectTransform)quoteT, 276f, 336f, 92f);
-				SkinText(quoteT.GetComponent<TMP_Text>(), _prose, UITheme.FsProse, UITheme.Muted,
+				FromTop((RectTransform)quoteT, 264f, 336f, 92f);
+				quoteLabel = Fresh(quoteT);
+				SkinText(quoteLabel, _prose, UITheme.FsProse, UITheme.Muted,
 					TextAlignmentOptions.Top, true, true);
+				quoteLabel.text = "He keeps the lights on. For now.";
 			}
 
 			// ---- tags
 			Transform tagsT = root.transform.Find("Tags");
+			TMP_Text tagsLabel = null;
 			if (tagsT != null)
 			{
-				FromTop((RectTransform)tagsT, 376f, 368f, 24f);
-				SkinText(tagsT.GetComponent<TMP_Text>(), _font, UITheme.FsMicro, UITheme.Muted,
+				FromTop((RectTransform)tagsT, 362f, 368f, 24f);
+				tagsLabel = Fresh(tagsT);
+				SkinText(tagsLabel, _font, UITheme.FsMicro, UITheme.Muted,
 					TextAlignmentOptions.Center, false, true);
-				tagsT.GetComponent<TMP_Text>().text = "TAG";
+				tagsLabel.text = "TAG";
 			}
 
 			// ---- effects
 			Transform effectsT = root.transform.Find("Effects");
+			TMP_Text effectsLabel = null;
 			if (effectsT != null)
 			{
-				FromBottom((RectTransform)effectsT, 16f, 368f, 184f);
-				SkinText(effectsT.GetComponent<TMP_Text>(), _font, UITheme.FsBody, UITheme.Bone,
+				FromBottom((RectTransform)effectsT, 16f, 368f, 160f);
+				effectsLabel = Fresh(effectsT);
+				SkinText(effectsLabel, _font, UITheme.FsBody, UITheme.Bone,
 					TextAlignmentOptions.TopLeft, true, false);
-				effectsT.GetComponent<TMP_Text>().text = "+1 SURVIVAL\n-1 MORALE";
+				effectsLabel.text = "+1 SURVIVAL\n-1 MORALE";
 			}
 
 			// ---- cost badge
 			Transform badgeT = root.transform.Find("CostBadge");
+			TMP_Text costLabel = null;
 			if (badgeT != null)
 			{
 				Box((RectTransform)badgeT, new Vector2(1f, 1f), new Vector2(1f, 1f),
@@ -505,10 +538,37 @@ public static class PixelArtTheme
 				if (costT != null)
 				{
 					Stretch((RectTransform)costT, Vector4.zero);
-					SkinText(costT.GetComponent<TMP_Text>(), _font, UITheme.FsMicro, UITheme.Bg,
+					costLabel = Fresh(costT);
+					SkinText(costLabel, _font, UITheme.FsMicro, UITheme.Bg,
 						TextAlignmentOptions.Center, false, true);
-					costT.GetComponent<TMP_Text>().text = "2 SLOTS";
+					costLabel.text = "2 SLOTS";
 				}
+			}
+
+			// ---- point CardView at the rebuilt components
+			var view = root.GetComponent<CardView>();
+			if (view != null)
+			{
+				var so = new SerializedObject(view);
+				so.FindProperty("hoverFrame").objectReferenceValue = _panelLit;
+
+				var roleIcons = so.FindProperty("roleIcons");
+				roleIcons.arraySize = roles.Length;
+				for (int i = 0; i < roles.Length; i++)
+					roleIcons.GetArrayElementAtIndex(i).objectReferenceValue = Icon(roles[i]);
+
+				Transform band = root.transform.Find("TopBand");
+				if (band != null)
+					so.FindProperty("topBand").objectReferenceValue = band.GetComponent<Image>();
+
+				so.FindProperty("nameText").objectReferenceValue = nameLabel;
+				so.FindProperty("roleText").objectReferenceValue = roleLabel;
+				so.FindProperty("quoteText").objectReferenceValue = quoteLabel;
+				so.FindProperty("tagsText").objectReferenceValue = tagsLabel;
+				so.FindProperty("effectsText").objectReferenceValue = effectsLabel;
+				so.FindProperty("costText").objectReferenceValue = costLabel;
+
+				so.ApplyModifiedPropertiesWithoutUndo();
 			}
 
 			Say("card prefab 400x600");
