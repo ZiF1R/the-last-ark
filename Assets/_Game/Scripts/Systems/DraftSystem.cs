@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 public class DraftSystem
 {
@@ -10,16 +9,13 @@ public class DraftSystem
 
 		foreach (CardDef card in db.cards)
 		{
-			if (card == null) continue;
 			if (state.crew.Contains(card)) continue;
 			if (state.lostCrew.Contains(card)) continue;
+
+			// if there are only cards with 2 slots cost, empty slot remaining //! fix
 			if (card.slotCost > state.SlotsLeft) continue;
 			candidates.Add(card);
 		}
-
-		if (candidates.Count == 0)
-			Debug.LogWarning($"[Draft] Empty offer: turn {state.turn}, slots left {state.SlotsLeft}, " +
-				$"crew {state.crew.Count}, sealed {state.sealedSlots.Count}, lost {state.lostCrew.Count}");
 
 		if (candidates.Count <= count) return candidates;
 

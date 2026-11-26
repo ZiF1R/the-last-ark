@@ -136,6 +136,7 @@ public class CardView : MonoBehaviour
 	public void OnPointerEnter(PointerEventData eventData)
 	{
 		if (!_interactable) return;
+		AudioManager.Play("hover");
 		AnimateHover(true);
 	}
 

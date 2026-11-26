@@ -33,7 +33,11 @@ public class EpilogueView : MonoBehaviour
 	void Awake()
 	{
 		if (restartButton != null)
-			restartButton.onClick.AddListener(flow.Restart);
+			restartButton.onClick.AddListener(() =>
+			{
+				AudioManager.Play("start");
+				flow.Restart();
+			});
 
 		if (sealingButton != null)
 			sealingButton.onClick.AddListener(RevealEnding);

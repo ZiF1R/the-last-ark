@@ -30,7 +30,7 @@ public static class PixelArtTheme
 	static TMP_FontAsset _fontBold;  // Silkscreen Bold
 	static TMP_FontAsset _prose;     // VT323
 
-	static Sprite _panel, _panelLit, _well, _btn, _btnDown, _btnSlate, _btnSlateDown, _seat, _divider, _stars;
+	static Sprite _panel, _panelLit, _well, _btn, _btnDown, _btnSlate, _btnSlateDown, _seat, _divider, _stars, _sliderFill, _iconSound;
 
 	// ---------------------------------------------------------------- entry
 
@@ -62,6 +62,8 @@ public static class PixelArtTheme
 			ApplySealing(scene);
 			ApplyFeed(scene);
 			ApplyFader(scene);
+			ApplyAudio(scene);
+			ApplySoundUI(scene);
 			ApplyTitle(scene);
 
 			AssetDatabase.SaveAssets();
@@ -186,6 +188,8 @@ public static class PixelArtTheme
 		_seat = Sprite("seat_9s");
 		_divider = Sprite("divider");
 		_stars = Sprite("stars_tile");
+		_sliderFill = Sprite("slider_fill_9s");
+		_iconSound = Icon("volume");
 	}
 
 	static Sprite Sprite(string file)
@@ -671,7 +675,8 @@ public static class PixelArtTheme
 		RectTransform turn = Rect("UI/Canvas/GameScreen/TopBar/TurnLabel");
 		if (turn != null)
 		{
-			Box(turn, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-48f, 20f), new Vector2(430f, 40f));
+			// x -96 keeps the box clear of the sound button at the bar's right edge
+			Box(turn, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-96f, 20f), new Vector2(430f, 40f));
 			SkinText(turn.GetComponent<TMP_Text>(), _font, UITheme.FsBody, UITheme.Bone,
 				TextAlignmentOptions.Right);
 		}
@@ -1280,8 +1285,39 @@ public static class PixelArtTheme
 		SkinText(labelText, _fontBold, UITheme.FsBody, UITheme.Bg, TextAlignmentOptions.Center);
 		labelText.text = "BOARD THE ARK";
 
-		TitleLabel(panel.transform, "Foot", -300f, 1400f, 24f, _font, UITheme.FsMicro, UITheme.Muted,
-			"ART · KENNEY PIXEL UI (CC0) · GAME-ICONS.NET (CC BY 3.0)   FONTS · SILKSCREEN, VT323 (OFL)");
+		// ---- music / sfx sliders: one row, pinned above the credit lines
+		// rebuilt from scratch each pass: stale duplicates would stack
+		GameObject staleRow = panel.transform.Find("AudioRow")?.gameObject;
+		if (staleRow != null) UnityEngine.Object.DestroyImmediate(staleRow);
+		GameObject staleBlock = panel.transform.Find("AudioBlock")?.gameObject;
+		if (staleBlock != null) UnityEngine.Object.DestroyImmediate(staleBlock);
+
+		GameObject audioRow = Existing(panel.transform, "AudioRow");
+		Box((RectTransform)audioRow.transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
+			new Vector2(0f, 118f), new Vector2(900f, 30f));
+
+		Slider musicSlider = SliderGroup(audioRow.transform, "MusicGroup",
+			new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0f), 420f, "MUSIC", _font);
+		Slider sfxSlider = SliderGroup(audioRow.transform, "SfxGroup",
+			new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(480f, 0f), 420f, "SFX", _font);
+
+		var audioView = audioRow.GetComponent<AudioSettingsView>();
+		if (audioView == null) audioView = audioRow.AddComponent<AudioSettingsView>();
+
+		var audioViewSo = new SerializedObject(audioView);
+		audioViewSo.FindProperty("music").objectReferenceValue = musicSlider;
+		audioViewSo.FindProperty("sfx").objectReferenceValue = sfxSlider;
+		audioViewSo.ApplyModifiedPropertiesWithoutUndo();
+
+		// ---- credits, two lines pinned to the bottom edge
+		GameObject foot = Existing(panel.transform, "Foot");
+		Box((RectTransform)foot.transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
+			new Vector2(0f, 22f), new Vector2(1700f, 56f));
+
+		var footText = foot.GetComponent<TMP_Text>();
+		if (footText == null) footText = Fresh(foot.transform);
+		SkinText(footText, _font, UITheme.FsMicro, UITheme.Muted, TextAlignmentOptions.Center, true);
+		footText.text = "ART - KENNEY PIXEL UI (CC0) / GAME-ICONS.NET (CC BY 3.0)   FONTS - SILKSCREEN, VT323 (OFL)\nMUSIC - PSYCHRONIC (PIXABAY)   SFX - KENNEY (CC0)";
 
 		// ---- wire it up
 		var view = panel.GetComponent<TitleView>();
@@ -1304,8 +1340,301 @@ public static class PixelArtTheme
 		Say("title screen wired");
 	}
 
-	static void TitleLabel(Transform parent, string name, float y, float width, float height,
-		TMP_FontAsset font, float size, Color color, string content, bool multiline = false)
+	// ---------------------------------------------------------------- audio
+
+	static void ApplySoundUI(Scene scene)
+	{
+		// ---- small sound button in the top bar
+		RectTransform bar = Rect("UI/Canvas/GameScreen/TopBar");
+		if (bar == null)
+		{
+			Warn("missing top bar for sound button");
+			return;
+		}
+
+		GameObject buttonGo = Existing(bar, "SoundButton");
+		var buttonRt = (RectTransform)buttonGo.transform;
+		Box(buttonRt, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-16f, 0f), new Vector2(44f, 44f));
+
+		var buttonImage = buttonGo.GetComponent<Image>();
+		if (buttonImage == null) buttonImage = buttonGo.AddComponent<Image>();
+		SkinImage(buttonImage, _btnSlate, Color.white);
+
+		var button = buttonGo.GetComponent<Button>();
+		if (button == null) button = buttonGo.AddComponent<Button>();
+		button.targetGraphic = buttonImage;
+		SkinButton(button, _btnSlate, _btnSlateDown);
+
+		GameObject iconGo = Existing(buttonGo.transform, "Icon");
+		Box((RectTransform)iconGo.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+			new Vector2(0f, 0f), new Vector2(24f, 24f));
+		var iconImage = iconGo.GetComponent<Image>();
+		if (iconImage == null) iconImage = iconGo.AddComponent<Image>();
+		SkinImage(iconImage, _iconSound, UITheme.Bone, Image.Type.Simple);
+		iconImage.preserveAspect = true;
+
+		// ---- compact popup panel with the same two sliders
+		Transform canvas = Find("UI/Canvas");
+		if (canvas == null) return;
+
+		GameObject panelGo = Existing(canvas, "SoundPanel");
+		// rebuilt from scratch each pass: stale slider groups would stack
+		while (panelGo.transform.childCount > 0)
+			UnityEngine.Object.DestroyImmediate(panelGo.transform.GetChild(0).gameObject);
+		var panelRt = (RectTransform)panelGo.transform;
+		Box(panelRt, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-16f, 72f), new Vector2(360f, 112f));
+
+		var panelImage = panelGo.GetComponent<Image>();
+		if (panelImage == null) panelImage = panelGo.AddComponent<Image>();
+		SkinImage(panelImage, _panel, Color.white);
+
+		GameObject headGo = Existing(panelGo.transform, "Head");
+		Box((RectTransform)headGo.transform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+			new Vector2(0f, -6f), new Vector2(330f, 20f));
+		var headText = headGo.GetComponent<TMP_Text>();
+		if (headText == null) headText = Fresh(headGo.transform);
+		SkinText(headText, _font, UITheme.FsMicro, UITheme.Muted, TextAlignmentOptions.Left);
+		headText.text = "SOUND";
+
+		Slider musicSlider = SliderGroup(panelGo.transform, "MusicGroup",
+			new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(15f, -32f), 320f, "MUSIC", _font);
+		Slider sfxSlider = SliderGroup(panelGo.transform, "SfxGroup",
+			new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(15f, -72f), 320f, "SFX", _font);
+
+		var audioView = panelGo.GetComponent<AudioSettingsView>();
+		if (audioView == null) audioView = panelGo.AddComponent<AudioSettingsView>();
+
+		var audioViewSo = new SerializedObject(audioView);
+		audioViewSo.FindProperty("music").objectReferenceValue = musicSlider;
+		audioViewSo.FindProperty("sfx").objectReferenceValue = sfxSlider;
+		audioViewSo.ApplyModifiedPropertiesWithoutUndo();
+
+		// ---- toggle
+		var toggle = buttonGo.GetComponent<SoundToggle>();
+		if (toggle == null) toggle = buttonGo.AddComponent<SoundToggle>();
+
+		var toggleSo = new SerializedObject(toggle);
+		toggleSo.FindProperty("panel").objectReferenceValue = panelGo;
+		toggleSo.FindProperty("button").objectReferenceValue = button;
+		toggleSo.ApplyModifiedPropertiesWithoutUndo();
+
+		// above every screen, below the title panel and the fader; starts closed
+		// (both here and in SoundToggle.Awake, so edit-mode captures agree with play)
+		panelGo.SetActive(false);
+		Transform fader = canvas.Find("Fader");
+		Transform title = canvas.Find("TitlePanel");
+		int index = title != null ? title.GetSiblingIndex() : (fader != null ? fader.GetSiblingIndex() : canvas.childCount);
+		panelGo.transform.SetSiblingIndex(index);
+
+		Say("sound button + popup panel wired");
+	}
+
+	static void ApplyAudio(Scene scene)
+	{
+		Transform system = Find("System");
+		if (system == null)
+		{
+			Warn("missing System root");
+			return;
+		}
+
+		GameObject go = Existing(system, "Audio");
+
+		var mgr = go.GetComponent<AudioManager>();
+		if (mgr == null) mgr = go.AddComponent<AudioManager>();
+		GameObject musicGo = Existing(go.transform, "Music");
+		var music = musicGo.GetComponent<AudioSource>();
+		if (music == null) music = musicGo.AddComponent<AudioSource>();
+		music.playOnAwake = false;
+		music.loop = true;
+
+		var voices = new AudioSource[4];
+
+		for (int i = 0; i < voices.Length; i++)
+		{
+			GameObject voiceGo = Existing(go.transform, "Voice" + i);
+			voices[i] = voiceGo.GetComponent<AudioSource>();
+			if (voices[i] == null) voices[i] = voiceGo.AddComponent<AudioSource>();
+			voices[i].playOnAwake = false;
+		}
+
+		// One listener is enough: add one only when the scene has none at all.
+		if (UnityEngine.Object.FindAnyObjectByType<AudioListener>() == null)
+			go.AddComponent<AudioListener>();
+
+		AudioClip musicClip = AssetDatabase.LoadAssetAtPath<AudioClip>(
+			"Assets/_Game/Audio/Music/somber_monolith.mp3");
+		if (musicClip == null) Warn("missing music somber_monolith.mp3");
+
+		AudioManager.SfxEntry[] entries =
+		{
+			// The raw Kenney clips are loud; master SFX starts at 22% on top.
+			Entry("hover",   0.35f, 0.90f, 1.00f, "ui_hover_1", "ui_hover_2"),
+			Entry("click",   0.50f, 0.97f, 1.03f, "ui_click"),
+			Entry("seat",    0.50f, 0.97f, 1.03f, "ui_seat"),
+			Entry("event",   0.50f, 0.96f, 1.02f, "ui_event"),
+			Entry("choice",  0.50f, 0.97f, 1.03f, "ui_choice"),
+			Entry("lost",    0.45f, 0.90f, 0.96f, "ui_lost"),
+			// Soft glass chime instead of the old synth powerUp; alternates live
+			// next to it (ui_synergy_alt_1/2.ogg) if this one needs swapping.
+			Entry("synergy", 0.40f, 0.97f, 1.03f, "ui_synergy"),
+			Entry("start",   0.55f, 0.99f, 1.03f, "ui_start"),
+			Entry("end",     0.45f, 0.90f, 0.96f, "ui_end"),
+		};
+
+		var so = new SerializedObject(mgr);
+		so.FindProperty("music").objectReferenceValue = music;
+		so.FindProperty("musicClip").objectReferenceValue = musicClip;
+
+		var voicesProp = so.FindProperty("voices");
+		voicesProp.arraySize = voices.Length;
+
+		for (int i = 0; i < voices.Length; i++)
+			voicesProp.GetArrayElementAtIndex(i).objectReferenceValue = voices[i];
+
+		var entriesProp = so.FindProperty("entries");
+		entriesProp.arraySize = entries.Length;
+
+		for (int i = 0; i < entries.Length; i++)
+		{
+			SerializedProperty el = entriesProp.GetArrayElementAtIndex(i);
+			el.FindPropertyRelative("id").stringValue = entries[i].id;
+
+			SerializedProperty clips = el.FindPropertyRelative("clips");
+			clips.arraySize = entries[i].clips.Length;
+
+			for (int k = 0; k < entries[i].clips.Length; k++)
+				clips.GetArrayElementAtIndex(k).objectReferenceValue = entries[i].clips[k];
+
+			el.FindPropertyRelative("volume").floatValue = entries[i].volume;
+			el.FindPropertyRelative("pitchMin").floatValue = entries[i].pitchMin;
+			el.FindPropertyRelative("pitchMax").floatValue = entries[i].pitchMax;
+		}
+
+		so.ApplyModifiedPropertiesWithoutUndo();
+		Say("audio system wired");
+	}
+
+	static AudioManager.SfxEntry Entry(string id, float volume, float pitchMin, float pitchMax, params string[] files)
+	{
+		var e = new AudioManager.SfxEntry
+		{
+			id = id,
+			volume = volume,
+			pitchMin = pitchMin,
+			pitchMax = pitchMax,
+			clips = new AudioClip[files.Length]
+		};
+
+		for (int i = 0; i < files.Length; i++)
+		{
+			e.clips[i] = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/_Game/Audio/SFX/" + files[i] + ".ogg");
+			if (e.clips[i] == null) Warn("missing clip " + files[i]);
+		}
+
+		return e;
+	}
+
+	/// <summary>Builds a complete pixel slider (track, fill, handle) of the given size.</summary>
+	static Slider MakeSlider(Transform parent, string name, float width, float height)
+	{
+		GameObject sliderGo = Node(name, parent);
+		var sliderRt = (RectTransform)sliderGo.transform;
+		Box(sliderRt, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(width, height));
+
+		GameObject trackGo = Existing(sliderGo.transform, "Background");
+		Stretch((RectTransform)trackGo.transform, Vector4.zero);
+
+		var track = trackGo.GetComponent<Image>();
+		if (track == null) track = trackGo.AddComponent<Image>();
+		track.sprite = _well;
+		track.type = Image.Type.Sliced;
+		track.pixelsPerUnitMultiplier = 0.25f;
+		track.raycastTarget = true;
+
+		GameObject fillArea = Existing(sliderGo.transform, "Fill Area");
+		var fillAreaRt = (RectTransform)fillArea.transform;
+		fillAreaRt.anchorMin = new Vector2(0f, 0f);
+		fillAreaRt.anchorMax = new Vector2(1f, 1f);
+		fillAreaRt.pivot = new Vector2(0.5f, 0.5f);
+		fillAreaRt.offsetMin = new Vector2(6f, 3f);
+		fillAreaRt.offsetMax = new Vector2(-6f, -3f);
+
+		GameObject fillGo = Existing(fillArea.transform, "Fill");
+		var fillRect = (RectTransform)fillGo.transform;
+		// Plain sliced sprite; the Slider drives the fill's anchors on value
+		// changes. 0.7 here is only so the edit-mode capture shows a real slider.
+		fillRect.anchorMin = new Vector2(0f, 0f);
+		fillRect.anchorMax = new Vector2(0.7f, 1f);
+		fillRect.pivot = new Vector2(0.5f, 0.5f);
+		fillRect.offsetMin = new Vector2(0f, 0f);
+		fillRect.offsetMax = new Vector2(0f, 0f);
+
+		var fill = fillGo.GetComponent<Image>();
+		if (fill == null) fill = fillGo.AddComponent<Image>();
+		fill.sprite = _sliderFill;
+		fill.type = Image.Type.Sliced;
+		fill.pixelsPerUnitMultiplier = 0.25f;
+		fill.raycastTarget = false;
+
+		GameObject handleArea = Existing(sliderGo.transform, "Handle Slide Area");
+		var handleAreaRt = (RectTransform)handleArea.transform;
+		handleAreaRt.anchorMin = new Vector2(0f, 0f);
+		handleAreaRt.anchorMax = new Vector2(1f, 1f);
+		handleAreaRt.pivot = new Vector2(0.5f, 0.5f);
+		handleAreaRt.offsetMin = new Vector2(12f, 0f);
+		handleAreaRt.offsetMax = new Vector2(-12f, 0f);
+
+		GameObject handleGo = Existing(handleArea.transform, "Handle");
+		var handleRect = (RectTransform)handleGo.transform;
+		handleRect.anchorMin = new Vector2(0.5f, 0.5f);
+		handleRect.anchorMax = new Vector2(0.5f, 0.5f);
+		handleRect.pivot = new Vector2(0.5f, 0.5f);
+		handleRect.sizeDelta = new Vector2(24f, 38f);
+
+		var handle = handleGo.GetComponent<Image>();
+		if (handle == null) handle = handleGo.AddComponent<Image>();
+		handle.sprite = _btn;
+		handle.type = Image.Type.Sliced;
+		handle.pixelsPerUnitMultiplier = 0.25f;
+		handle.raycastTarget = true;
+
+		var slider = sliderGo.GetComponent<Slider>();
+		if (slider == null) slider = sliderGo.AddComponent<Slider>();
+		slider.targetGraphic = handle;
+		slider.handleRect = handleRect;
+		slider.fillRect = fillRect;
+		slider.direction = Slider.Direction.LeftToRight;
+		slider.minValue = 0f;
+		slider.maxValue = 1f;
+		slider.transition = Selectable.Transition.None;
+		slider.SetValueWithoutNotify(0.7f);
+
+		return slider;
+	}
+
+	/// <summary>A label plus a slider in one compact group, positioned by the caller.</summary>
+	static Slider SliderGroup(Transform parent, string name, Vector2 anchor, Vector2 pivot, Vector2 pos,
+		float width, string labelText, TMP_FontAsset font)
+	{
+		GameObject group = Node(name, parent);
+		Box((RectTransform)group.transform, anchor, pivot, pos, new Vector2(width, 30f));
+
+		GameObject label = Existing(group.transform, "Label");
+		Box((RectTransform)label.transform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f),
+			new Vector2(4f, 0f), new Vector2(64f, 26f));
+
+		var lt = label.GetComponent<TMP_Text>();
+		if (lt == null) lt = Fresh(label.transform);
+		SkinText(lt, font, UITheme.FsMicro, UITheme.Bone, TextAlignmentOptions.Left);
+		lt.text = labelText;
+
+		Slider slider = MakeSlider(group.transform, "Slider", width - 72f, 26f);
+		Box((RectTransform)slider.gameObject.transform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f),
+			new Vector2(72f, 0f), new Vector2(width - 72f, 26f));
+		return slider;
+	}
+	static void TitleLabel(Transform parent, string name, float y, float width, float height,		TMP_FontAsset font, float size, Color color, string content, bool multiline = false)
 	{
 		GameObject go = Existing(parent, name);
 		Box((RectTransform)go.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),

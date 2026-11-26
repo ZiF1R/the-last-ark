@@ -231,6 +231,8 @@ public class EventPopupView : MonoBehaviour
 
 	void OnContinueClicked()
 	{
+		AudioManager.Play("click");
+
 		_event = null;
 
 		StopAllCoroutines();

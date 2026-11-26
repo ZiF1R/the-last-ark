@@ -85,7 +85,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5442862461020793943}
   - component: {fileID: 1374142248612791536}
-  - component: {fileID: 7431467259627398474}
+  - component: {fileID: 3751053190464737286}
   m_Layer: 5
   m_Name: Quote
   m_TagString: Untagged
@@ -120,7 +120,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 977316230083403834}
   m_CullTransparentMesh: 1
---- !u!114 &7431467259627398474
+--- !u!114 &3751053190464737286
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -222,7 +222,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6646324152905321873}
   - component: {fileID: 6558027069802061823}
-  - component: {fileID: 5118938456306009131}
+  - component: {fileID: 3318584468327403336}
   m_Layer: 5
   m_Name: Role
   m_TagString: Untagged
@@ -257,7 +257,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1542300283333681127}
   m_CullTransparentMesh: 1
---- !u!114 &5118938456306009131
+--- !u!114 &3318584468327403336
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -359,7 +359,7 @@ GameObject:
   m_Component:
   - component: {fileID: 366194637756347365}
   - component: {fileID: 6917399190942228197}
-  - component: {fileID: 1624889039918126935}
+  - component: {fileID: 2919995694015406762}
   m_Layer: 5
   m_Name: CostText
   m_TagString: Untagged
@@ -394,7 +394,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1634794537833814650}
   m_CullTransparentMesh: 1
---- !u!114 &1624889039918126935
+--- !u!114 &2919995694015406762
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -496,7 +496,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3360184059834991110}
   - component: {fileID: 1795038042266127727}
-  - component: {fileID: 4002000844358010128}
+  - component: {fileID: 4013680249602885637}
   m_Layer: 5
   m_Name: Effects
   m_TagString: Untagged
@@ -531,7 +531,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2808438533619275868}
   m_CullTransparentMesh: 1
---- !u!114 &4002000844358010128
+--- !u!114 &4013680249602885637
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -710,7 +710,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6724905141655982414}
   - component: {fileID: 9142740008346174013}
-  - component: {fileID: 9061811921875318849}
+  - component: {fileID: 9151277559610453341}
   m_Layer: 5
   m_Name: Tags
   m_TagString: Untagged
@@ -745,7 +745,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4561211461538346476}
   m_CullTransparentMesh: 1
---- !u!114 &9061811921875318849
+--- !u!114 &9151277559610453341
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1016,13 +1016,13 @@ MonoBehaviour:
   frame: {fileID: 7048090200218065200}
   icon: {fileID: 3259241938163076936}
   topBand: {fileID: 984194502286190147}
-  nameText: {fileID: 8665992629300318765}
-  roleText: {fileID: 5118938456306009131}
-  quoteText: {fileID: 7431467259627398474}
-  effectsText: {fileID: 4002000844358010128}
-  tagsText: {fileID: 9061811921875318849}
+  nameText: {fileID: 1096299964936373739}
+  roleText: {fileID: 3318584468327403336}
+  quoteText: {fileID: 3751053190464737286}
+  effectsText: {fileID: 4013680249602885637}
+  tagsText: {fileID: 9151277559610453341}
   costBadge: {fileID: 7755213537134467889}
-  costText: {fileID: 1624889039918126935}
+  costText: {fileID: 2919995694015406762}
   button: {fileID: 6720802933018617193}
   hoverFrame: {fileID: 21300000, guid: 6463d2ceff26a6b4ca3a936520156b8f, type: 3}
   roleIcons:
@@ -1049,7 +1049,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7329016727656896595}
   - component: {fileID: 3186918081681184057}
-  - component: {fileID: 8665992629300318765}
+  - component: {fileID: 1096299964936373739}
   m_Layer: 5
   m_Name: Name
   m_TagString: Untagged
@@ -1084,7 +1084,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7428947102593507739}
   m_CullTransparentMesh: 1
---- !u!114 &8665992629300318765
+--- !u!114 &1096299964936373739
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

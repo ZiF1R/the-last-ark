@@ -24,6 +24,7 @@ public class TitleView : MonoBehaviour
 	void OnStart()
 	{
 		if (startButton != null) startButton.interactable = false;
+		AudioManager.Play("start");
 		if (flow != null) flow.BeginRun();
 	}
 
