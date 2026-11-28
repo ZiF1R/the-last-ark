@@ -21,7 +21,7 @@ MonoBehaviour:
     slotCost: 1
     survival: 2
     science: 1
-    morale: -2
+    morale: -1
     passiveSurvival: 0
     passiveScience: 0
     passiveMorale: 0
@@ -63,7 +63,7 @@ MonoBehaviour:
     slotCost: 1
     survival: 1
     science: 2
-    morale: -2
+    morale: -1
     passiveSurvival: 0
     passiveScience: 0
     passiveMorale: 0
@@ -126,7 +126,7 @@ MonoBehaviour:
     slotCost: 1
     survival: 1
     science: 0
-    morale: -2
+    morale: -1
     passiveSurvival: 0
     passiveScience: 0
     passiveMorale: 0
@@ -378,7 +378,7 @@ MonoBehaviour:
     slotCost: 1
     survival: 1
     science: 1
-    morale: -2
+    morale: -1
     passiveSurvival: 0
     passiveScience: 0
     passiveMorale: 0
@@ -516,6 +516,132 @@ MonoBehaviour:
       turns: 1
     eventOnPickId: 
     <weight>k__BackingField: 9
+    icon: {fileID: 0}
+  - id: dagny_engineer
+    displayName: Dagny
+    role: 1
+    quote: I rerouted the heat. You will not like where it comes from.
+    tags: 0000000002000000
+    slotCost: 1
+    survival: 0
+    science: 3
+    morale: -2
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: -1
+      turns: 3
+    eventOnPickId: 
+    <weight>k__BackingField: 6
+    icon: {fileID: 0}
+  - id: wren_medic
+    displayName: Wren
+    role: 3
+    quote: Pain is a signal. I teach the crew to hang up on it.
+    tags: 0500000006000000
+    slotCost: 1
+    survival: 0
+    science: 1
+    morale: 3
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
+    eventOnPickId: 
+    <weight>k__BackingField: 5
+    icon: {fileID: 0}
+  - id: griet_farmer
+    displayName: Griet
+    role: 6
+    quote: Half farm, half lab. The plants do not know the difference.
+    tags: 0800000002000000
+    slotCost: 1
+    survival: 1
+    science: 2
+    morale: 0
+    passiveSurvival: 0
+    passiveScience: 1
+    passiveMorale: 0
+    passivePeriod: 2
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
+    eventOnPickId: 
+    <weight>k__BackingField: 7
+    icon: {fileID: 0}
+  - id: adam_sick
+    displayName: Adam
+    role: 5
+    quote: The diagnosis is late. So are the parts. We are even.
+    tags: 0700000000000000
+    slotCost: 1
+    survival: -1
+    science: 2
+    morale: -1
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: -1
+      turns: 3
+    eventOnPickId: 
+    <weight>k__BackingField: 9
+    icon: {fileID: 0}
+  - id: noor_child
+    displayName: Noor
+    role: 4
+    quote: I named all the sprouts. Two of them answer.
+    tags: 0300000008000000
+    slotCost: 1
+    survival: 0
+    science: 0
+    morale: 2
+    passiveSurvival: 1
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 3
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
+    eventOnPickId: 
+    <weight>k__BackingField: 6
+    icon: {fileID: 0}
+  - id: vess_mutant
+    displayName: Vess
+    role: 7
+    quote: I glow in the dark. It saves lamps.
+    tags: 0900000002000000
+    slotCost: 1
+    survival: -2
+    science: 3
+    morale: 0
+    passiveSurvival: 0
+    passiveScience: 0
+    passiveMorale: 0
+    passivePeriod: 1
+    delayed:
+      survival: 0
+      science: 0
+      morale: 0
+      turns: 1
+    eventOnPickId: 
+    <weight>k__BackingField: 6
     icon: {fileID: 0}
   events:
   - id: oskar_reveal
@@ -1331,7 +1457,7 @@ MonoBehaviour:
       role: 0
       flag: 
       stat: 1
-      value: 3
+      value: 6
     - kind: 0
       tag: 2
       role: 0
@@ -1456,11 +1582,44 @@ MonoBehaviour:
     forbiddenFlags: []
     requiredTags: 
     forbiddenTags: 
+  - id: end_no_air_b
+    title: THE LONG BREATH
+    body: The last canister is logged, sealed and empty. The crew voted to stop opening
+      the reserves. There is nothing to open. Someone winds the clock anyway. It
+      is still ticking. It will outlast the air by a week.
+    priority: 100
+    minSurvival: 0
+    minScience: 0
+    minMorale: 0
+    maxSurvival: 0
+    maxScience: 10
+    maxMorale: 10
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 
+    forbiddenTags: 
   - id: end_no_signal
     title: NO SIGNAL
     body: The science station goes dark. The samples are still in the fridge. The
       fridge is still cold. Nobody knows how to run the fridge. The log has a line
       for this. The line is blank.
+    priority: 100
+    minSurvival: 0
+    minScience: 0
+    minMorale: 0
+    maxSurvival: 10
+    maxScience: 0
+    maxMorale: 10
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 
+    forbiddenTags: 
+  - id: end_no_signal_b
+    title: STATIC
+    body: The telemetry breaks into noise on turn nine. Nobody can say what broke
+      it. The crew keeps the screens on. The screens keep the lights on. The noise
+      keeps the crew. Somebody swears there is a pattern in it. Somebody else starts
+      to hear one.
     priority: 100
     minSurvival: 0
     minScience: 0
@@ -1488,12 +1647,45 @@ MonoBehaviour:
     forbiddenFlags: []
     requiredTags: 
     forbiddenTags: 
+  - id: end_no_voice_b
+    title: THE QUIET MESS
+    body: Dinner is served on time. Six trays, six seats, no conversation. The chairs
+      scrape, the trays clear, the lights dim. In the morning nobody remembers the
+      meal. The roster does. The roster remembers everything now.
+    priority: 100
+    minSurvival: 0
+    minScience: 0
+    minMorale: 0
+    maxSurvival: 10
+    maxScience: 10
+    maxMorale: 0
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 
+    forbiddenTags: 
+  - id: end_ark_sails
+    title: THE ARK SAILS
+    body: Everything holds. The air is sweet, the numbers are green, and the crew
+      argues about movies instead of rations. The chart shows a coast that should
+      not exist. The engines say you will reach it. For the first time, nobody on
+      this ship is keeping a count of anything. There is nothing left to count against.
+    priority: 90
+    minSurvival: 9
+    minScience: 9
+    minMorale: 9
+    maxSurvival: 10
+    maxScience: 10
+    maxMorale: 10
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 
+    forbiddenTags: 
   - id: end_order
     title: ORDER
     body: The orders stand. The rounds are counted. The crew obeys without being
       asked. The log is full. The log is clean. The ship runs on time. Nobody remembers
       who wrote the first order. It does not matter. The order is the ship now.
-    priority: 72
+    priority: 82
     minSurvival: 5
     minScience: 0
     minMorale: 0
@@ -1512,8 +1704,8 @@ MonoBehaviour:
       still in the room. The room is warm. The ship is warm. The crew does not go
       near the room. The log says the reactor is fine. The log is written by the
       reactor now.
-    priority: 70
-    minSurvival: 0
+    priority: 78
+    minSurvival: 2
     minScience: 6
     minMorale: 0
     maxSurvival: 10
@@ -1522,51 +1714,141 @@ MonoBehaviour:
     requiredFlags:
     - reactor_open
     forbiddenFlags: []
-    requiredTags: 00000000
+    requiredTags: 
     forbiddenTags: 
   - id: end_mapped
-    title: THE MAP WAS RIGHT
-    body: The rivers are there. The map was old, not wrong. The dreamer is not surprised.
-      The ship follows the rivers. The rivers are not water. The rivers are something
-      else. The log has a new entry. The entry is a drawing.
-    priority: 65
-    minSurvival: 0
+    title: THE MAPPED COAST
+    body: 'The map was right. Every badly drawn turn of it. The crew sails the route
+      like a psalm, and the coast arrives exactly when the ink said it would. Whatever
+      drew that map knew these waters. Nobody on board asks the only question that
+      matters, which is: who is drawing the next one.'
+    priority: 76
+    minSurvival: 4
     minScience: 0
-    minMorale: 5
+    minMorale: 0
     maxSurvival: 10
     maxScience: 10
     maxMorale: 10
     requiredFlags:
     - map_followed
     forbiddenFlags: []
-    requiredTags: 06000000
+    requiredTags: 
     forbiddenTags: 
-  - id: end_clean_air
-    title: CLEAN AIR
-    body: The bunk is sealed. The sick man is gone. The air is clean. The crew breathes
-      without thinking about it. The log has a name in it. The name is the only thing
-      in the bunk. The air is very clean.
-    priority: 60
-    minSurvival: 0
-    minScience: 0
-    minMorale: 0
+  - id: end_greenhouse
+    title: THE GREENHOUSE
+    body: The dead soil grows. It took three failures and one near mutiny, but the
+      racks are green and the smell is wrong in the best way. The crew eats something
+      it grew. Nobody had eaten something that was alive an hour before. The ship
+      is a farm now. Farms do not sink.
+    priority: 70
+    minSurvival: 6
+    minScience: 4
+    minMorale: 4
     maxSurvival: 10
     maxScience: 10
     maxMorale: 10
     requiredFlags:
-    - bunk_sealed
+    - seed_saved
     forbiddenFlags: []
-    requiredTags: 
-    forbiddenTags: 07000000
-  - id: end_all_high
-    title: ALL HANDS
-    body: The numbers are good. The crew is fed. The lab is warm. The log is full.
-      The ship is not dying. It is not living either. It is holding. The crew calls
-      this a victory. The log does not use that word.
-    priority: 50
-    minSurvival: 7
-    minScience: 7
+    requiredTags: 08000000
+    forbiddenTags: 
+  - id: end_ward
+    title: THE WARD
+    body: 'The sick do not die. That is the whole miracle, and it takes all of it:
+      the medic''s hours, the cold bunks, the rations nobody steals. The fevers break
+      in order, like a list being worked. The last one up is the one who kept the
+      list. She takes it down to the mess and pins it to the wall, finished.'
+    priority: 68
+    minSurvival: 2
+    minScience: 4
+    minMorale: 2
+    maxSurvival: 10
+    maxScience: 10
+    maxMorale: 10
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 0500000007000000
+    forbiddenTags: 
+  - id: end_choir
+    title: THE CHOIR
+    body: It starts as humming in the ducts. Then the children carry it to the mess,
+      and the soldiers stop pretending not to listen. By the fourth watch the whole
+      crew is singing, badly, in three languages that agree on the chorus. The ship
+      sails on the sound. It should not work. It works.
+    priority: 68
+    minSurvival: 2
+    minScience: 0
     minMorale: 7
+    maxSurvival: 10
+    maxScience: 10
+    maxMorale: 10
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 06000000
+    forbiddenTags: 
+  - id: end_new_crew
+    title: THE NEW CREW
+    body: The scan came back and nobody hid it again. The changed ones eat at the
+      same table, work the same watches, and their names stay in the log without
+      asterisks. Whatever the deep water is making, it signed the articles this time.
+      The ship carries the first crew of two species, and the species gets along.
+    priority: 70
+    minSurvival: 3
+    minScience: 3
+    minMorale: 5
+    maxSurvival: 10
+    maxScience: 10
+    maxMorale: 10
+    requiredFlags:
+    - mutant_kept
+    forbiddenFlags: []
+    requiredTags: 09000000
+    forbiddenTags: 
+  - id: end_engine_holds
+    title: THE ENGINE HOLDS
+    body: The engine was not built for this voyage, and it holds anyway. Every night
+      it runs a little hotter, and every night the engineers swear a little quieter.
+      It holds. The crew learns to sleep inside the noise. When it finally shakes,
+      they hold the rail, and it holds.
+    priority: 66
+    minSurvival: 7
+    minScience: 3
+    minMorale: 0
+    maxSurvival: 10
+    maxScience: 10
+    maxMorale: 10
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 00000000
+    forbiddenTags: 
+  - id: end_someone_small
+    title: SOMEONE SMALL
+    body: The future of the species is nine years old and currently grounded for
+      stealing engine grease. She draws on the checklists, names the pumps, asks
+      the questions that have no answers. The crew keeps her alive the way you keep
+      a match alive. Something to carry across. Something to strike on the other
+      side.
+    priority: 66
+    minSurvival: 4
+    minScience: 4
+    minMorale: 6
+    maxSurvival: 10
+    maxScience: 10
+    maxMorale: 10
+    requiredFlags: []
+    forbiddenFlags: []
+    requiredTags: 03000000
+    forbiddenTags: 
+  - id: end_lab
+    title: THE LAB
+    body: 'The lab hums through the last stretch. Everything the crew survived is
+      written up, dated and filed: the fever, the mutation, the air. The conclusions
+      will reach land before the stories do, and they will save more people than
+      the ship ever carried. The crew is small. The data is not.'
+    priority: 65
+    minSurvival: 2
+    minScience: 8
+    minMorale: 2
     maxSurvival: 10
     maxScience: 10
     maxMorale: 10
@@ -1574,61 +1856,46 @@ MonoBehaviour:
     forbiddenFlags: []
     requiredTags: 
     forbiddenTags: 
-  - id: end_lab
-    title: THE LAB
-    body: The science station is the warmest room on the ship. The crew does not
-      go in. The samples are labeled. The labels are correct. The lab runs all night.
-      The crew sleeps. The ship is a laboratory now. The laboratory is doing fine.
-    priority: 50
-    minSurvival: 0
-    minScience: 7
-    minMorale: 0
-    maxSurvival: 6
-    maxScience: 10
-    maxMorale: 6
-    requiredFlags: []
-    forbiddenFlags: []
-    requiredTags: 
-    forbiddenTags: 
-  - id: end_choir
-    title: THE CHOIR
-    body: The crew sings. Nobody knows when it started. The log has a line for it.
-      The line is a note. The note is not in any of the manuals. The ship runs. The
-      crew sings. The singing is not a celebration. It is a habit.
-    priority: 50
-    minSurvival: 0
-    minScience: 0
-    minMorale: 7
-    maxSurvival: 6
-    maxScience: 6
-    maxMorale: 10
+  - id: end_clean_air
+    title: CLEAN AIR
+    body: The gauges settle at six and stay there. No alarms, no cannibalised parts,
+      no speeches in the mess. The crew fixed what was broken and did not break anything
+      that worked. It is the most boring voyage in the history of the service. The
+      log says so. Nobody has ever been prouder of a boring log.
+    priority: 62
+    minSurvival: 6
+    minScience: 6
+    minMorale: 6
+    maxSurvival: 8
+    maxScience: 8
+    maxMorale: 8
     requiredFlags: []
     forbiddenFlags: []
     requiredTags: 
     forbiddenTags: 
   - id: end_hold
-    title: HOLD
-    body: The ship holds. The numbers are good. The crew is fed. The log is clean.
-      The ship does not move. It holds. The holding is the whole plan. The plan is
-      working. The log says so. The log is written by the captain. The captain is
-      holding too.
-    priority: 50
-    minSurvival: 7
-    minScience: 0
-    minMorale: 0
-    maxSurvival: 10
-    maxScience: 6
-    maxMorale: 6
+    title: THE HOLD
+    body: 'Nobody dies. That is the report, and the report is the achievement. The
+      air is thin, the science is thin, the jokes are thin. The crew walks through
+      the ship like tired men carrying furniture. The ark holds together, and the
+      crew holds on. Some voyages are just this: not losing.'
+    priority: 30
+    minSurvival: 3
+    minScience: 3
+    minMorale: 3
+    maxSurvival: 7
+    maxScience: 9
+    maxMorale: 7
     requiredFlags: []
     forbiddenFlags: []
     requiredTags: 
     forbiddenTags: 
   - id: end_drift
     title: DRIFT
-    body: The ship drifts. The numbers are not good or bad. The crew is not happy
-      or sad. The log has entries. The entries are short. The ship is still going.
-      Nobody knows where. The drift is not a failure. It is not a success. It is
-      a drift.
+    body: The ark does not sink and does not arrive. The current takes it somewhere
+      the chart does not cover. The crew learns the sound of the hull and the smell
+      of the recycled air, and then forgets there was ever another kind. The log
+      keeps the count of days. The count is wrong. It does not matter.
     priority: 0
     minSurvival: 0
     minScience: 0
@@ -1767,3 +2034,21 @@ MonoBehaviour:
     morale: 1
     setFlag: 
     text: Two sets of rows. One harvest.
+  - id: syn_sci_sci
+    tagA: 2
+    tagB: 2
+    countB: 2
+    survival: 0
+    science: 2
+    morale: -1
+    setFlag: 
+    text: The lab never sleeps. The results arrive at three and nobody signs them.
+  - id: syn_farm_dream
+    tagA: 8
+    tagB: 6
+    countB: 1
+    survival: 1
+    science: 0
+    morale: 1
+    setFlag: 
+    text: He describes the fields they will plant on land. She starts the seeds tonight.

@@ -655,7 +655,7 @@ public static partial class ContentSeed
                  + "The cultures are not growing. The scientist is still watching them.",
             conditions = new[]
             {
-                new StateCondition { kind = ConditionKind.StatAtMost, stat = StatKind.Science, value = 3 },
+                new StateCondition { kind = ConditionKind.StatAtMost, stat = StatKind.Science, value = 6 },
                 new StateCondition { kind = ConditionKind.TagPresent, tag = CardTag.Scientist },
             },
             minTurn = 2, maxTurn = 99, priority = 0, weight = 10, once = true,

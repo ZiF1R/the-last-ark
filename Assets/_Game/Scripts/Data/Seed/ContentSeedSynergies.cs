@@ -144,5 +144,25 @@ public static partial class ContentSeed
             setFlag = "",
             text = "Two sets of rows. One harvest.",
         },
+        new SynergyDef
+        {
+            id = "syn_sci_sci",
+            tagA = CardTag.Scientist,
+            tagB = CardTag.Scientist,
+            countB = 2,
+            survival = 0, science = 2, morale = -1,
+            setFlag = "",
+            text = "The lab never sleeps. The results arrive at three and nobody signs them.",
+        },
+        new SynergyDef
+        {
+            id = "syn_farm_dream",
+            tagA = CardTag.Farmer,
+            tagB = CardTag.Dreamer,
+            countB = 1,
+            survival = 1, science = 0, morale = 1,
+            setFlag = "",
+            text = "He describes the fields they will plant on land. She starts the seeds tonight.",
+        },
     };
 }
